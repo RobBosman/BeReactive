@@ -1,5 +1,12 @@
 package nl.cerios.reactive.pizza
 
+import com.mongodb.client.MongoClient
+import com.mongodb.client.MongoCollection
+import nl.cerios.reactive.pizza.FetchJokeService.fetchJoke
+import nl.cerios.reactive.pizza.StorageService.convertAndStore
+import nl.cerios.reactive.pizza.StorageService.getMongoClient
+import nl.cerios.reactive.pizza.StorageService.getMongoCollection
+import org.bson.Document
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
@@ -34,10 +41,28 @@ internal class AsyncWithFuturesTest {
     log.debug("here we go")
     val executor = Executors.newFixedThreadPool(4)
 
-    val taskCompletedF = AsyncWithFutures().run(executor)
+    val jokeRawF = executor.submit<String>(::fetchJoke)
 
-    log.debug("wait until done")
-    taskCompletedF.get() // blocking wait
+    val mongoClientF = executor.submit<MongoClient>(::getMongoClient)
+
+    val mongoCollectionF = executor.submit<MongoCollection<Document>> {
+      log.debug("wait for MongoDB client")
+      val mongoClient = mongoClientF.get() // blocking wait
+      getMongoCollection(mongoClient)
+    }
+
+    val allDoneF = executor.submit<Unit> {
+      log.debug("wait for async tasks to complete")
+      val jokeRaw = jokeRawF.get() // blocking wait
+      val mongoCollection = mongoCollectionF.get() // blocking wait
+
+      convertAndStore(jokeRaw, mongoCollection)
+      log.debug("close MongoDB client")
+      mongoClientF.get().close()
+    }
+
+    log.debug("wait until all is done")
+    allDoneF.get() // blocking wait
 
     executor.shutdown()
     log.debug("there you are!")
