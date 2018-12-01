@@ -5,17 +5,17 @@ import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.Projections
 import org.bson.Document
-import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
 object StorageService {
 
   private val log = LoggerFactory.getLogger(javaClass)
+  private const val connectionString = "mongodb://localhost:27017"
 
   fun getMongoClient(): MongoClient {
     log.debug("get MongoDB client")
-    val mongoClient = MongoClients.create("mongodb://localhost:27017")
+    val mongoClient = MongoClients.create(connectionString)
     log.debug("got MongoDB client")
     return mongoClient
   }
@@ -31,12 +31,12 @@ object StorageService {
 
   fun convertAndStore(jokeRaw: String, mongoCollection: MongoCollection<Document>) {
     log.debug("convert and store joke")
-    val joke = JSONObject(jokeRaw)
-        .getJSONObject("value")
-        .getString("joke")
+    val jokeValue = Document.parse(jokeRaw)["value"] as Document
     val jokeDocument = Document()
         .append("at", LocalDateTime.now())
-        .append("joke", joke)
+        .append("joke", jokeValue["joke"])
+        .append("categories", jokeValue["categories"])
+
     mongoCollection.insertOne(jokeDocument)
     log.debug("converted and stored joke")
   }
@@ -45,6 +45,6 @@ object StorageService {
     mongoCollection
         .find()
         .projection(Projections.excludeId())
-        .forEach { d -> println("\t\t${d.toJson()}") }
+        .forEach { d -> println(d.toJson()) }
   }
 }

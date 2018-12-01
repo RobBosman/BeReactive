@@ -7,13 +7,11 @@ import java.net.URL
 object FetchJokeService {
 
   private val log = LoggerFactory.getLogger(javaClass)
+  private const val url = "http://api.icndb.com/jokes/random?limitTo=[nerdy,explicit]" // Chuck Norris jokes
 
   fun fetchJoke(): String {
     log.debug("fetch joke")
-    val url = URL("http://api.icndb.com/jokes/random?limitTo=[nerdy,explicit]") // Chuck Norris jokes
-    val httpConnection = url.openConnection() as HttpURLConnection
-    httpConnection.connectTimeout = 5000
-    httpConnection.readTimeout = 5000
+    val httpConnection = URL(url).openConnection() as HttpURLConnection
     try {
       httpConnection.inputStream.reader()
           .use { httpReader ->

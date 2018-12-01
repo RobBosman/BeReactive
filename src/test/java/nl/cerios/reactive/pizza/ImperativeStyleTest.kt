@@ -7,7 +7,7 @@ import nl.cerios.reactive.pizza.StorageService.getMongoCollection
 import nl.cerios.reactive.pizza.StorageService.printAllJokes
 import org.junit.jupiter.api.Test
 
-internal class ImperativeStyleTest {
+internal object ImperativeStyleTest {
 
   @Test
   fun run() {

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 
-internal class AsyncWithFuturesTest {
+internal object AsyncWithFuturesTest {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
@@ -25,7 +25,7 @@ internal class AsyncWithFuturesTest {
   fun futureProof() {
     val executor = Executors.newFixedThreadPool(2)
 
-    val future = executor.submit<Int>(::findTheAnswer)
+    val future = executor.submit(::findTheAnswer)
     log.debug("Are you done? - ${future.isDone}")
 
     // do other stuff
@@ -41,24 +41,19 @@ internal class AsyncWithFuturesTest {
     log.debug("here we go")
     val executor = Executors.newFixedThreadPool(4)
 
-    val jokeRawF = executor.submit<String>(::fetchJoke)
+    val jokeRawF = executor.submit(::fetchJoke)
 
-    val mongoClientF = executor.submit<MongoClient>(::getMongoClient)
+    val mongoClientF = executor.submit(::getMongoClient)
 
-    val mongoCollectionF = executor.submit<MongoCollection<Document>> {
-      log.debug("wait for MongoDB client")
-      val mongoClient = mongoClientF.get() // blocking wait
-      getMongoCollection(mongoClient)
-    }
-
-    val allDoneF = executor.submit<Unit> {
+    val allDoneF = executor.submit {
       log.debug("wait for async tasks to complete")
       val jokeRaw = jokeRawF.get() // blocking wait
-      val mongoCollection = mongoCollectionF.get() // blocking wait
+      val mongoClient = mongoClientF.get() // blocking wait
 
+      val mongoCollection = getMongoCollection(mongoClient)
       convertAndStore(jokeRaw, mongoCollection)
       log.debug("close MongoDB client")
-      mongoClientF.get().close()
+      mongoClient.close()
     }
 
     log.debug("wait until all is done")

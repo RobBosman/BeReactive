@@ -8,51 +8,50 @@ import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture
 
-internal class AsyncWithCompletableFuturesTest {
+internal object AsyncWithCompletableFuturesTest {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
   @Test
   fun completableFutureProof() {
-    val completableFuture = CompletableFuture<Int>()
-
-    CompletableFuture
+    val provideAnswerCF = CompletableFuture
         .supplyAsync {
           log.debug("Determine required processing time")
-          1000L
+          1500L
         }
         .thenAcceptAsync { delayMillis ->
-          log.debug("Processing...")
+          log.debug("Pondering...")
           Thread.sleep(delayMillis)
         }
         .thenApply {
           log.debug("Got it!")
           42
         }
-        .thenAccept { answer ->
-          completableFuture.complete(answer)
-        }
 
-    log.debug("Do you know the answer? - ${completableFuture.isDone}")
-    val answer = completableFuture.get() // blocking wait
+    log.debug("Do you know the answer? - ${provideAnswerCF.isDone}")
+    val answer = provideAnswerCF.get() // blocking wait
     log.debug("Ah, the answer is $answer.")
   }
 
   @Test
   fun run() {
     log.debug("here we go")
-    val jokeRawCF = CompletableFuture.supplyAsync(::fetchJoke)
+    val jokeRawCF = CompletableFuture
+        .supplyAsync(::fetchJoke)
 
-    val mongoClientCF = CompletableFuture.supplyAsync(::getMongoClient)
-
-    val allDoneCF =
-        mongoClientCF
-            .thenApply(::getMongoCollection)
-            .thenCombine(jokeRawCF) { mongoCollection, jokeRaw -> convertAndStore(jokeRaw, mongoCollection) }
-            .thenAccept {
-              log.debug("close MongoDB client")
-              mongoClientCF.get().close()
-            }
+    val allDoneCF = CompletableFuture
+        .supplyAsync {
+          getMongoClient()
+        }
+        .thenCombine(jokeRawCF) { mongoClient, jokeRaw ->
+          val mongoCollection = getMongoCollection(mongoClient)
+          convertAndStore(jokeRaw, mongoCollection)
+          mongoClient
+        }
+        .thenAccept { mongoClient ->
+          log.debug("close MongoDB client")
+          mongoClient.close()
+        }
 
     log.debug("wait until all is done")
     allDoneCF.get() // blocking wait
