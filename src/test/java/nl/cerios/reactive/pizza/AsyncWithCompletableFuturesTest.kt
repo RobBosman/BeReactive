@@ -13,7 +13,7 @@ internal object AsyncWithCompletableFuturesTest {
   private val log = LoggerFactory.getLogger(javaClass)
 
   @Test
-  fun completableFutureProof() {
+  fun hitchhikersGuideToTheCompletableFuture() {
     val provideAnswerCF = CompletableFuture
         .supplyAsync {
           log.debug("Determine required processing time")

@@ -34,6 +34,12 @@
       <artifactId>mongodb-driver-sync</artifactId>
       <version>RELEASE</version>
     </dependency>
+    <!-- RxJava -->
+    <dependency>
+      <groupId>io.reactivex.rxjava2</groupId>
+      <artifactId>rxjava</artifactId>
+      <version>RELEASE</version>
+    </dependency>
     <!-- test -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>

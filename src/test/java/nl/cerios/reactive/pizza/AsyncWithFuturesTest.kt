@@ -1,12 +1,9 @@
 package nl.cerios.reactive.pizza
 
-import com.mongodb.client.MongoClient
-import com.mongodb.client.MongoCollection
 import nl.cerios.reactive.pizza.FetchJokeService.fetchJoke
 import nl.cerios.reactive.pizza.StorageService.convertAndStore
 import nl.cerios.reactive.pizza.StorageService.getMongoClient
 import nl.cerios.reactive.pizza.StorageService.getMongoCollection
-import org.bson.Document
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
@@ -22,12 +19,12 @@ internal object AsyncWithFuturesTest {
   }
 
   @Test
-  fun futureProof() {
+  fun hitchhikersGuideToTheFuture() {
     val executor = Executors.newFixedThreadPool(2)
 
     val future = executor.submit(::findTheAnswer)
-    log.debug("Are you done? - ${future.isDone}")
 
+    log.debug("Are you done? - ${future.isDone}")
     // do other stuff
 
     val answer = future.get() // blocking wait
