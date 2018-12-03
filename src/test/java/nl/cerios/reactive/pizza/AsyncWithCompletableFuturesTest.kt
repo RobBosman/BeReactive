@@ -19,7 +19,7 @@ internal object AsyncWithCompletableFuturesTest {
           log.debug("Determine required processing time")
           1500L
         }
-        .thenAcceptAsync { delayMillis ->
+        .thenAccept { delayMillis ->
           log.debug("Pondering...")
           Thread.sleep(delayMillis)
         }
@@ -44,9 +44,6 @@ internal object AsyncWithCompletableFuturesTest {
         .thenCombine(jokeRawCF) { mongoClient, jokeRaw ->
           val mongoCollection = getMongoCollection(mongoClient)
           convertAndStore(jokeRaw, mongoCollection)
-          mongoClient
-        }
-        .thenAccept { mongoClient ->
           log.debug("close MongoDB client")
           mongoClient.close()
         }

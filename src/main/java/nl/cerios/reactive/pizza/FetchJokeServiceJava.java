@@ -20,15 +20,15 @@ public class FetchJokeServiceJava {
   public static String fetchJoke() {
     LOG.debug("fetch joke");
     try {
-      final HttpURLConnection httpConnection = (HttpURLConnection) new URL(API_URL).openConnection();
+      final HttpURLConnection connection = (HttpURLConnection) new URL(API_URL).openConnection();
       try {
-        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(httpConnection.getInputStream(), StandardCharsets.UTF_8))) {
+        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
           return reader.lines().collect(Collectors.joining());
         } catch (IOException e) {
           throw new RuntimeException("Error reading from InputStream", e);
         }
       } finally {
-        httpConnection.disconnect();
+        connection.disconnect();
         LOG.debug("fetched joke");
       }
     } catch (MalformedURLException e) {

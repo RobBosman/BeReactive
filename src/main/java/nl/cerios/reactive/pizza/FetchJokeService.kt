@@ -11,14 +11,14 @@ object FetchJokeService {
 
   fun fetchJoke(): String {
     log.debug("fetch joke")
-    val httpConnection = URL(apiUrl).openConnection() as HttpURLConnection
+    val connection = URL(apiUrl).openConnection() as HttpURLConnection
     try {
-      httpConnection.inputStream.reader()
-          .use { httpReader ->
-            return httpReader.readText()
+      connection.inputStream.reader()
+          .use { reader ->
+            return reader.readText()
           }
     } finally {
-      httpConnection.disconnect()
+      connection.disconnect()
       log.debug("fetched joke")
     }
   }

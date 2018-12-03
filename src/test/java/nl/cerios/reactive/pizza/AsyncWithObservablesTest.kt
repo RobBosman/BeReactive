@@ -6,10 +6,11 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import nl.cerios.reactive.pizza.FetchJokeService.fetchJoke
 import nl.cerios.reactive.pizza.StorageService.getMongoClient
+import nl.cerios.reactive.pizza.StorageService.getMongoCollection
+import nl.cerios.reactive.pizza.StorageService.convertAndStore
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
 internal object AsyncWithObservablesTest {
@@ -94,27 +95,18 @@ internal object AsyncWithObservablesTest {
     log.debug("here we go")
 
     val jokeRawO = Observable
-        .create<Future<String>> { emitter ->
-          emitter.onNext(CompletableFuture.supplyAsync(::fetchJoke))
-        }
+        .create<String> { emitter -> emitter.onNext(fetchJoke()) }
+        .subscribeOn(Schedulers.computation())
 
     Observable
-        .create<Future<MongoClient>> { emitter ->
-          emitter.onNext(CompletableFuture.supplyAsync(::getMongoClient))
-        }
+        .create<MongoClient> { emitter -> emitter.onNext(getMongoClient()) }
+        .subscribeOn(Schedulers.computation())
         .zipWith(jokeRawO,
-            BiFunction { mongoClientF: Future<MongoClient>, jokeRawF: Future<String> ->
-              CompletableFuture.supplyAsync {
-                log.debug("wait for tasks to complete")
-                val mongoClient = mongoClientF.get()
-                val jokeRaw = jokeRawF.get()
-
-                val mongoCollection = StorageService.getMongoCollection(mongoClient)
-                StorageService.convertAndStore(jokeRaw, mongoCollection)
-
+            BiFunction { mongoClient: MongoClient, jokeRaw: String ->
+                val mongoCollection = getMongoCollection(mongoClient)
+                convertAndStore(jokeRaw, mongoCollection)
                 log.debug("close MongoDB client")
                 mongoClient.close()
-              }
             })
         .subscribe()
 
