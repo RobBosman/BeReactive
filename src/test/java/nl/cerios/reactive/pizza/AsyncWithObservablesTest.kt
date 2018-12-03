@@ -8,6 +8,7 @@ import nl.cerios.reactive.pizza.StorageService.getMongoClient
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
 
@@ -68,28 +69,28 @@ internal object AsyncWithObservablesTest {
 
 
     val jokeRawO = Observable
-        .create<CompletableFuture<String>> { emitter ->
+        .create<Future<String>> { emitter ->
           emitter.onNext(CompletableFuture.supplyAsync(::fetchJoke))
-          emitter.onComplete()
         }
+
     Observable
-        .create<CompletableFuture<MongoClient>> { emitter ->
+        .create<Future<MongoClient>> { emitter ->
           emitter.onNext(CompletableFuture.supplyAsync(::getMongoClient))
-          emitter.onComplete()
         }
         .zipWith(jokeRawO,
-            BiFunction<CompletableFuture<MongoClient>, CompletableFuture<String>, MongoClient> { mongoClientCF, jokeRawCF ->
-              val mongoClient = mongoClientCF.get()
-              val jokeRaw = jokeRawCF.get()
+            BiFunction { mongoClientF: Future<MongoClient>, jokeRawF: Future<String> ->
+              CompletableFuture.supplyAsync {
+                log.debug("wait for tasks to complete")
+                val mongoClient = mongoClientF.get()
+                val jokeRaw = jokeRawF.get()
 
-              val mongoCollection = StorageService.getMongoCollection(mongoClient)
-              StorageService.convertAndStore(jokeRaw, mongoCollection)
-              mongoClient
+                val mongoCollection = StorageService.getMongoCollection(mongoClient)
+                StorageService.convertAndStore(jokeRaw, mongoCollection)
+
+                log.debug("close MongoDB client")
+                mongoClient.close()
+              }
             })
-        .map { mongoClient ->
-          log.debug("close MongoDB client")
-          mongoClient.close()
-        }
         .subscribe()
 
     log.debug("wait until all is done")
