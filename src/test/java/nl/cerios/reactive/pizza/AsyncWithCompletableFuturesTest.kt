@@ -40,9 +40,7 @@ internal object AsyncWithCompletableFuturesTest {
         .supplyAsync(::fetchJoke)
 
     val allDoneCF = CompletableFuture
-        .supplyAsync {
-          getMongoClient()
-        }
+        .supplyAsync(::getMongoClient)
         .thenCombine(jokeRawCF) { mongoClient, jokeRaw ->
           val mongoCollection = getMongoCollection(mongoClient)
           convertAndStore(jokeRaw, mongoCollection)
