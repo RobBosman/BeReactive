@@ -1,14 +1,13 @@
-package nl.cerios.reactive.pizza.crippled
+package nl.cerios.reactive.pizza
 
 import com.mongodb.client.MongoClient
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
+import nl.cerios.reactive.pizza.FetchJokeServiceFlaky.fetchJokeFlaky
 import nl.cerios.reactive.pizza.StorageService.convertAndStore
-import nl.cerios.reactive.pizza.StorageService.getMongoClient
 import nl.cerios.reactive.pizza.StorageService.getMongoCollection
-import nl.cerios.reactive.pizza.crippled.FetchJokeServiceCrippled.fetchJokeCrippled
-import nl.cerios.reactive.pizza.crippled.StorageServiceCrippled.getMongoClientCrippled
+import nl.cerios.reactive.pizza.StorageServiceFlaky.getMongoClientFlaky
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 
@@ -21,11 +20,12 @@ internal object ResilienceTest {
     log.debug("here we go")
 
     Observable
-        .create<String> { emitter -> emitter.onNext(fetchJokeCrippled()) }
+        .create<String> { emitter -> emitter.onNext(fetchJokeFlaky()) }
+        .retry(3)
         .subscribeOn(Schedulers.computation())
         .subscribe(
             { log.debug(it) },
-            { t -> log.error("An error occurred", t) }
+            { t -> log.error("an ERROR occurred", t) }
         )
 
     log.debug("wait a second...")
@@ -39,12 +39,14 @@ internal object ResilienceTest {
     log.debug("here we go")
 
     val jokeRawO = Observable
-        .create<String> { emitter -> emitter.onNext(fetchJokeCrippled()) }
+        .create<String> { emitter -> emitter.onNext(fetchJokeFlaky()) }
         .subscribeOn(Schedulers.computation())
+        .retry(3)
 
     Observable
-        .create<MongoClient> { emitter -> emitter.onNext(getMongoClient()) }
+        .create<MongoClient> { emitter -> emitter.onNext(getMongoClientFlaky()) }
         .subscribeOn(Schedulers.computation())
+        .retry(2)
         .zipWith(jokeRawO,
             BiFunction { mongoClient: MongoClient, jokeRaw: String ->
               val mongoCollection = getMongoCollection(mongoClient)
@@ -52,9 +54,10 @@ internal object ResilienceTest {
               log.debug("close MongoDB client")
               mongoClient.close()
             })
+        .retry(1)
         .subscribe(
             {},
-            { t -> log.error("An error occurred", t) }
+            { t -> log.error("an ERROR occurred", t) }
         )
 
     log.debug("wait until all is done")
