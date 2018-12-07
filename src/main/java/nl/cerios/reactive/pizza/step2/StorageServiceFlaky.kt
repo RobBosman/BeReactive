@@ -1,7 +1,7 @@
-package nl.cerios.reactive.pizza
+package nl.cerios.reactive.pizza.step2
 
 import com.mongodb.client.MongoClient
-import nl.cerios.reactive.pizza.StorageService.getMongoClient
+import nl.cerios.reactive.pizza.step1.StorageService.getMongoClient
 import org.slf4j.LoggerFactory
 import kotlin.random.Random
 

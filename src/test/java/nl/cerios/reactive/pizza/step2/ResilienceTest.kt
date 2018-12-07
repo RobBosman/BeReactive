@@ -1,13 +1,13 @@
-package nl.cerios.reactive.pizza
+package nl.cerios.reactive.pizza.step2
 
 import com.mongodb.client.MongoClient
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import nl.cerios.reactive.pizza.FetchJokeServiceFlaky.fetchJokeFlaky
-import nl.cerios.reactive.pizza.StorageService.convertAndStore
-import nl.cerios.reactive.pizza.StorageService.getMongoCollection
-import nl.cerios.reactive.pizza.StorageServiceFlaky.getMongoClientFlaky
+import nl.cerios.reactive.pizza.step1.StorageService.convertAndStore
+import nl.cerios.reactive.pizza.step1.StorageService.getMongoCollection
+import nl.cerios.reactive.pizza.step2.FetchJokeServiceFlaky.fetchJokeFlaky
+import nl.cerios.reactive.pizza.step2.StorageServiceFlaky.getMongoClientFlaky
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 

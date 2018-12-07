@@ -1,4 +1,4 @@
-package nl.cerios.reactive.pizza
+package nl.cerios.reactive.pizza.step1
 
 import org.slf4j.LoggerFactory
 import java.net.HttpURLConnection

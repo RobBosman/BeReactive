@@ -1,4 +1,4 @@
-package nl.cerios.reactive.pizza
+package nl.cerios.reactive.pizza.step1
 
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
@@ -45,6 +45,7 @@ object StorageService {
     mongoCollection
         .find()
         .projection(Projections.excludeId())
-        .forEach { d -> println(d.toJson()) }
+        .map(Document::toJson)
+        .forEach { println(it) }
   }
 }

@@ -1,9 +1,9 @@
-package nl.cerios.reactive.pizza
+package nl.cerios.reactive.pizza.step1
 
-import nl.cerios.reactive.pizza.FetchJokeService.fetchJoke
-import nl.cerios.reactive.pizza.StorageService.convertAndStore
-import nl.cerios.reactive.pizza.StorageService.getMongoClient
-import nl.cerios.reactive.pizza.StorageService.getMongoCollection
+import nl.cerios.reactive.pizza.step1.FetchJokeService.fetchJoke
+import nl.cerios.reactive.pizza.step1.StorageService.convertAndStore
+import nl.cerios.reactive.pizza.step1.StorageService.getMongoClient
+import nl.cerios.reactive.pizza.step1.StorageService.getMongoCollection
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture

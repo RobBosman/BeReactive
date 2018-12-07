@@ -1,4 +1,4 @@
-package nl.cerios.reactive.pizza;
+package nl.cerios.reactive.pizza.step0;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,6 +1,6 @@
-package nl.cerios.reactive.pizza
+package nl.cerios.reactive.pizza.step2
 
-import nl.cerios.reactive.pizza.FetchJokeService.fetchJoke
+import nl.cerios.reactive.pizza.step1.FetchJokeService.fetchJoke
 import org.slf4j.LoggerFactory
 import kotlin.random.Random
 

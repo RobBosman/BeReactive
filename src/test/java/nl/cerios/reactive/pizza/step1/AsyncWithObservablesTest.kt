@@ -1,13 +1,13 @@
-package nl.cerios.reactive.pizza
+package nl.cerios.reactive.pizza.step1
 
 import com.mongodb.client.MongoClient
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import nl.cerios.reactive.pizza.FetchJokeService.fetchJoke
-import nl.cerios.reactive.pizza.StorageService.getMongoClient
-import nl.cerios.reactive.pizza.StorageService.getMongoCollection
-import nl.cerios.reactive.pizza.StorageService.convertAndStore
+import nl.cerios.reactive.pizza.step1.FetchJokeService.fetchJoke
+import nl.cerios.reactive.pizza.step1.StorageService.convertAndStore
+import nl.cerios.reactive.pizza.step1.StorageService.getMongoClient
+import nl.cerios.reactive.pizza.step1.StorageService.getMongoCollection
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture
@@ -103,10 +103,10 @@ internal object AsyncWithObservablesTest {
         .subscribeOn(Schedulers.computation())
         .zipWith(jokeRawO,
             BiFunction { mongoClient: MongoClient, jokeRaw: String ->
-                val mongoCollection = getMongoCollection(mongoClient)
-                convertAndStore(jokeRaw, mongoCollection)
-                log.debug("close MongoDB client")
-                mongoClient.close()
+              val mongoCollection = getMongoCollection(mongoClient)
+              convertAndStore(jokeRaw, mongoCollection)
+              log.debug("close MongoDB client")
+              mongoClient.close()
             })
         .subscribe()
 
