@@ -11,6 +11,7 @@ import nl.cerios.reactive.pizza.step1.StorageService.getMongoCollection
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 
 internal object AsyncWithObservablesTest {
@@ -73,13 +74,13 @@ internal object AsyncWithObservablesTest {
       3 -> {
         Observable
             .fromFuture(CompletableFuture.supplyAsync(::fetchJoke))
-            .subscribeOn(Schedulers.computation())
+            .subscribeOn(Schedulers.io())
             .subscribe(log::debug)
       }
       4 -> {
         Observable
             .create<String> { emitter -> emitter.onNext(fetchJoke()) }
-            .subscribeOn(Schedulers.computation())
+            .subscribeOn(Schedulers.io())
             .subscribe(log::debug)
       }
     }
@@ -93,14 +94,15 @@ internal object AsyncWithObservablesTest {
   @Test
   fun run() {
     log.debug("here we go")
+    val genie = Semaphore(0)
 
     val jokeRawO = Observable
         .create<String> { emitter -> emitter.onNext(fetchJoke()) }
-        .subscribeOn(Schedulers.computation())
+        .subscribeOn(Schedulers.io())
 
     Observable
         .create<MongoClient> { emitter -> emitter.onNext(getMongoClient()) }
-        .subscribeOn(Schedulers.computation())
+        .subscribeOn(Schedulers.io())
         .zipWith(jokeRawO,
             BiFunction { mongoClient: MongoClient, jokeRaw: String ->
               val mongoCollection = getMongoCollection(mongoClient)
@@ -108,10 +110,11 @@ internal object AsyncWithObservablesTest {
               log.debug("close MongoDB client")
               mongoClient.close()
             })
+        .doFinally { genie.release() }
         .subscribe()
 
     log.debug("wait until all is done")
-    Thread.sleep(3000)
+    genie.tryAcquire(3000, TimeUnit.MILLISECONDS)
 
     log.debug("there you are!")
   }

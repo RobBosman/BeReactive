@@ -10,14 +10,18 @@ object StorageServiceFlaky {
   private val log = LoggerFactory.getLogger(javaClass)
 
   fun getMongoClientFlaky(): MongoClient {
-    // inject some chaos
-    return when (Random.nextInt(2)) {
+    return when (Random.nextInt(3)) {
       0 -> {
-        log.debug("cause an ERROR")
-        throw RuntimeException("ERROR")
+        log.debug("==> throw an exception")
+        throw RuntimeException("EXCEPTION")
+      }
+      1 -> {
+        log.debug("==> do not respond")
+        Thread.sleep(Long.MAX_VALUE)
+        throw RuntimeException("TIMEOUT")
       }
       else -> {
-        log.debug("invoke service")
+        log.debug("==> invoke service")
         getMongoClient()
       }
     }

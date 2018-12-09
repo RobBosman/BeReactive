@@ -1,7 +1,7 @@
 package nl.cerios.reactive.pizza.step2
 
 import com.mongodb.client.MongoClient
-import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import nl.cerios.reactive.pizza.step1.StorageService.convertAndStore
@@ -10,26 +10,33 @@ import nl.cerios.reactive.pizza.step2.FetchJokeServiceFlaky.fetchJokeFlaky
 import nl.cerios.reactive.pizza.step2.StorageServiceFlaky.getMongoClientFlaky
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
+import java.util.concurrent.Semaphore
+import java.util.concurrent.TimeUnit
 
 internal object ResilienceTest {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
   @Test
-  fun hitchhikersGuideToResilience() {
+  fun hitchhikersGuideToResilience_1() {
     log.debug("here we go")
+    val genie = Semaphore(0)
 
-    Observable
-        .create<String> { emitter -> emitter.onNext(fetchJokeFlaky()) }
+    Single
+        .create<String> { emitter -> emitter.onSuccess(fetchJokeFlaky()) }
+        .timeout(200, TimeUnit.MILLISECONDS)
+        .subscribeOn(Schedulers.io())
+        .doOnError { t -> log.warn("error detected: '${t.message}'") }
         .retry(3)
-        .subscribeOn(Schedulers.computation())
+        .onErrorResumeNext(Single.just("fallback joke"))
+        .doFinally { genie.release() }
         .subscribe(
-            { log.debug(it) },
+            { joke -> log.debug("'$joke'") },
             { t -> log.error("an ERROR occurred", t) }
         )
 
     log.debug("wait a second...")
-    Thread.sleep(2000)
+    genie.tryAcquire(1000, TimeUnit.MILLISECONDS)
 
     log.debug("there you are!")
   }
@@ -37,15 +44,18 @@ internal object ResilienceTest {
   @Test
   fun run() {
     log.debug("here we go")
+    val genie = Semaphore(0)
 
-    val jokeRawO = Observable
-        .create<String> { emitter -> emitter.onNext(fetchJokeFlaky()) }
-        .subscribeOn(Schedulers.computation())
+    val jokeRawO = Single
+        .create<String> { emitter -> emitter.onSuccess(fetchJokeFlaky()) }
+        .timeout(200, TimeUnit.MILLISECONDS)
+        .subscribeOn(Schedulers.io())
         .retry(3)
 
-    Observable
-        .create<MongoClient> { emitter -> emitter.onNext(getMongoClientFlaky()) }
-        .subscribeOn(Schedulers.computation())
+    Single
+        .create<MongoClient> { emitter -> emitter.onSuccess(getMongoClientFlaky()) }
+        .timeout(500, TimeUnit.MILLISECONDS)
+        .subscribeOn(Schedulers.io())
         .retry(2)
         .zipWith(jokeRawO,
             BiFunction { mongoClient: MongoClient, jokeRaw: String ->
@@ -55,13 +65,14 @@ internal object ResilienceTest {
               mongoClient.close()
             })
         .retry(1)
+        .doFinally { genie.release() }
         .subscribe(
             {},
             { t -> log.error("an ERROR occurred", t) }
         )
 
-    log.debug("wait until all is done")
-    Thread.sleep(3000)
+    log.debug("wait a second...")
+    genie.tryAcquire(1000, TimeUnit.MILLISECONDS)
 
     log.debug("there you are!")
   }
