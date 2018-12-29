@@ -22,7 +22,7 @@ internal object AsyncWithFuturesTest {
   fun hitchhikersGuideToTheFuture() {
     val executor = Executors.newFixedThreadPool(2)
 
-    val future = executor.submit(AsyncWithFuturesTest::findTheAnswer)
+    val future = executor.submit(::findTheAnswer)
 
     log.debug("Are you done? - ${future.isDone}")
     // do other stuff

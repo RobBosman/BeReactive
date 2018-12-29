@@ -24,6 +24,7 @@ internal object ResilienceTest {
 
     Single
         .create<String> { emitter -> emitter.onSuccess(fetchJokeFlaky()) }
+        .doOnEvent { s, _ -> if (s == "ERROR") throw Exception("invalid data: $s") }
         .timeout(200, TimeUnit.MILLISECONDS)
         .subscribeOn(Schedulers.io())
         .doOnError { t -> log.warn("error detected: '${t.message}'") }
@@ -36,7 +37,7 @@ internal object ResilienceTest {
         )
 
     log.debug("wait a second...")
-    genie.tryAcquire(1000, TimeUnit.MILLISECONDS)
+    genie.tryAcquire(1_000, TimeUnit.MILLISECONDS)
 
     log.debug("there you are!")
   }
@@ -44,17 +45,18 @@ internal object ResilienceTest {
   @Test
   fun run() {
     log.debug("here we go")
-    val genie = Semaphore(0)
+    val yokeControl = Semaphore(0)
 
     val jokeRawO = Single
         .create<String> { emitter -> emitter.onSuccess(fetchJokeFlaky()) }
+        .doOnEvent { s, _ -> if (s == "ERROR") throw Exception("invalid data: $s") }
         .timeout(200, TimeUnit.MILLISECONDS)
         .subscribeOn(Schedulers.io())
         .retry(3)
 
     Single
         .create<MongoClient> { emitter -> emitter.onSuccess(getMongoClientFlaky()) }
-        .timeout(500, TimeUnit.MILLISECONDS)
+        .timeout(2_000, TimeUnit.MILLISECONDS)
         .subscribeOn(Schedulers.io())
         .retry(2)
         .zipWith(jokeRawO,
@@ -64,15 +66,14 @@ internal object ResilienceTest {
               log.debug("close MongoDB client")
               mongoClient.close()
             })
-        .retry(1)
-        .doFinally { genie.release() }
+        .doFinally { yokeControl.release() }
         .subscribe(
             {},
             { t -> log.error("an ERROR occurred", t) }
         )
 
     log.debug("wait a second...")
-    genie.tryAcquire(1000, TimeUnit.MILLISECONDS)
+    yokeControl.tryAcquire(10_000, TimeUnit.MILLISECONDS)
 
     log.debug("there you are!")
   }

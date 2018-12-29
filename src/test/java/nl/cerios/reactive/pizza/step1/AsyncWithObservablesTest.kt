@@ -25,7 +25,7 @@ internal object AsyncWithObservablesTest {
     val observable = Observable.fromIterable(words)
 
     observable
-        .subscribe { log.debug("subscriber 1: $it") }
+        .subscribe { it -> log.debug("subscriber 1: $it") }
 
     observable
         .map(String::toUpperCase)
@@ -53,7 +53,7 @@ internal object AsyncWithObservablesTest {
         .subscribe(log::debug)
 
     log.debug("wait a second...")
-    Thread.sleep(1000)
+    Thread.sleep(1_000)
   }
 
   @Test
@@ -86,7 +86,7 @@ internal object AsyncWithObservablesTest {
     }
 
     log.debug("wait a second...")
-    Thread.sleep(1000)
+    Thread.sleep(1_000)
 
     log.debug("there you are!")
   }
@@ -94,7 +94,7 @@ internal object AsyncWithObservablesTest {
   @Test
   fun run() {
     log.debug("here we go")
-    val genie = Semaphore(0)
+    val yokeControl = Semaphore(0)
 
     val jokeRawO = Observable
         .create<String> { emitter -> emitter.onNext(fetchJoke()) }
@@ -110,11 +110,11 @@ internal object AsyncWithObservablesTest {
               log.debug("close MongoDB client")
               mongoClient.close()
             })
-        .doFinally { genie.release() }
+        .doFinally { yokeControl.release() }
         .subscribe()
 
     log.debug("wait until all is done")
-    genie.tryAcquire(3000, TimeUnit.MILLISECONDS)
+    yokeControl.tryAcquire(3_000, TimeUnit.MILLISECONDS)
 
     log.debug("there you are!")
   }

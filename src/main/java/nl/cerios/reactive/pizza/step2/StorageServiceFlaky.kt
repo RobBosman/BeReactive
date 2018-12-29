@@ -12,16 +12,16 @@ object StorageServiceFlaky {
   fun getMongoClientFlaky(): MongoClient {
     return when (Random.nextInt(3)) {
       0 -> {
-        log.debug("==> throw an exception")
-        throw RuntimeException("EXCEPTION")
+        log.info("=== throw exception ===")
+        throw Exception("EXCEPTION")
       }
       1 -> {
-        log.debug("==> do not respond")
+        log.info("=== do not respond ===")
         Thread.sleep(Long.MAX_VALUE)
-        throw RuntimeException("TIMEOUT")
+        throw Exception("TIMEOUT")
       }
       else -> {
-        log.debug("==> invoke service")
+        log.info("    invoke StorageService")
         getMongoClient()
       }
     }

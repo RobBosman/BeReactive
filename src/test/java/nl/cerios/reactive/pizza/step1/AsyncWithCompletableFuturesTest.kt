@@ -19,13 +19,14 @@ internal object AsyncWithCompletableFuturesTest {
           log.debug("Determine required processing time")
           1500L
         }
-        .thenAccept { delayMillis ->
+        .thenApply { delayMillis ->
           log.debug("Pondering...")
           Thread.sleep(delayMillis)
-        }
-        .thenApply {
-          log.debug("Got it!")
           42
+        }
+        .thenApply { answer ->
+          log.debug("Got it!")
+          answer
         }
 
     log.debug("Do you know the answer? - ${provideAnswerCF.isDone}")

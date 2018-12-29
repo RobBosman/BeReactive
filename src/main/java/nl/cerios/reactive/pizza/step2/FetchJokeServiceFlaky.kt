@@ -11,20 +11,20 @@ object FetchJokeServiceFlaky {
   fun fetchJokeFlaky(): String {
     return when (Random.nextInt(4)) {
       0 -> {
-        log.debug("==> throw an exception")
-        throw RuntimeException("EXCEPTION")
+        log.info("=== throw exception ===")
+        throw Exception("EXCEPTION")
       }
       1 -> {
-        log.debug("==> do not respond")
+        log.info("=== do not respond ===")
         Thread.sleep(Long.MAX_VALUE)
-        throw RuntimeException("TIMEOUT")
+        throw Exception("TIMEOUT")
       }
       2 -> {
-        log.debug("==> return an error")
+        log.info("=== reply an error ===")
         "ERROR"
       }
       else -> {
-        log.debug("==> invoke service")
+        log.info("    invoke FetchJokeService")
         fetchJoke()
       }
     }
