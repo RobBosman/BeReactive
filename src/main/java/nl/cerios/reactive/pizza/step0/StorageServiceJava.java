@@ -11,19 +11,19 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.util.function.Consumer;
 
-public class StorageServiceJava {
+class StorageServiceJava {
 
   private static final Logger LOG = LoggerFactory.getLogger(StorageServiceJava.class);
-  private static final String CONNECTION_STRING = "mongodb://localhost:27017";
+  private static final String CONNECTION_STRING = System.getProperty("connectionString", "mongodb://localhost:27017");
 
-  public static MongoClient getMongoClient() {
+  static MongoClient getMongoClient() {
     LOG.debug("get MongoDB client");
     final MongoClient mongoClient = MongoClients.create(CONNECTION_STRING);
     LOG.debug("got MongoDB client");
     return mongoClient;
   }
 
-  public static MongoCollection<Document> getMongoCollection(final MongoClient mongoClient) {
+  static MongoCollection<Document> getMongoCollection(final MongoClient mongoClient) {
     LOG.debug("get MongoDB collection");
     final MongoCollection<Document> mongoCollection = mongoClient
         .getDatabase("reactive-pizza")
@@ -32,7 +32,15 @@ public class StorageServiceJava {
     return mongoCollection;
   }
 
-  public static void convertAndStore(final String jokeRaw, final MongoCollection<Document> mongoCollection) {
+  // {
+  //   "type": "success",
+  //   "value": {
+  //     "id": 464,
+  //     "joke": "...",
+  //     "categories": ["nerdy"]
+  //   }
+  // }
+  static void convertAndStore(final String jokeRaw, final MongoCollection<Document> mongoCollection) {
     LOG.debug("convert and store joke");
     final Document jokeValue = (Document) Document.parse(jokeRaw).get("value");
     final Document jokeDocument = new Document()
@@ -44,7 +52,7 @@ public class StorageServiceJava {
     LOG.debug("converted and stored joke");
   }
 
-  public static void printAllJokes(final MongoCollection<Document> mongoCollection) {
+  static void printAllJokes(final MongoCollection<Document> mongoCollection) {
     mongoCollection
         .find()
         .projection(Projections.excludeId())

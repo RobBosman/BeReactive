@@ -11,7 +11,7 @@ import java.time.LocalDateTime
 object StorageService {
 
   private val log = LoggerFactory.getLogger(javaClass)
-  private const val connectionString = "mongodb://localhost:27017"
+  private val connectionString = System.getProperty("connectionString", "mongodb://localhost:27017")
 
   fun getMongoClient(): MongoClient {
     log.debug("get MongoDB client")
@@ -29,6 +29,14 @@ object StorageService {
     return mongoCollection
   }
 
+  // {
+  //   "type": "success",
+  //   "value": {
+  //     "id": 464,
+  //     "joke": "...",
+  //     "categories": ["nerdy"]
+  //   }
+  // }
   fun convertAndStore(jokeRaw: String, mongoCollection: MongoCollection<Document>) {
     log.debug("convert and store joke")
     val jokeValue = Document.parse(jokeRaw)["value"] as Document

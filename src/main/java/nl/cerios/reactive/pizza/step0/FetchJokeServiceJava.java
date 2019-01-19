@@ -12,12 +12,12 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
-public class FetchJokeServiceJava {
+class FetchJokeServiceJava {
 
   private static final Logger LOG = LoggerFactory.getLogger(FetchJokeServiceJava.class);
   private static final String API_URL = "http://api.icndb.com/jokes/random?limitTo=[nerdy,explicit]"; // Chuck Norris jokes
 
-  public static String fetchJoke() {
+  static String fetchJoke() {
     LOG.debug("fetch joke");
     try {
       final HttpURLConnection connection = (HttpURLConnection) new URL(API_URL).openConnection();
