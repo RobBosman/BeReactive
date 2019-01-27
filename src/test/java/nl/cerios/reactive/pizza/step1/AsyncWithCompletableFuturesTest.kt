@@ -30,8 +30,7 @@ internal object AsyncWithCompletableFuturesTest {
         }
 
     log.debug("Do you know the answer? - ${provideAnswerCF.isDone}")
-    val answer = provideAnswerCF.get() // blocking wait
-    log.debug("Ah, the answer is $answer.")
+    log.debug("Ah, the answer is ${provideAnswerCF.get()}.") // blocking wait
   }
 
   @Test
@@ -44,14 +43,14 @@ internal object AsyncWithCompletableFuturesTest {
         .supplyAsync(::getMongoClient)
         .thenCombine(jokeRawCF) { mongoClient, jokeRaw ->
           val mongoCollection = getMongoCollection(mongoClient)
-          convertAndStore(jokeRaw, mongoCollection)
+          val joke = convertAndStore(jokeRaw, mongoCollection)
           log.debug("close MongoDB client")
           mongoClient.close()
+          joke
         }
 
     log.debug("wait until all is done")
-    allDoneCF.get() // blocking wait
-
+    log.info("'${allDoneCF.get()}'") // blocking wait
     log.debug("there you are!")
   }
 }

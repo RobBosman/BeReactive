@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Semaphore
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 internal object AsyncWithObservablesTest {
 
@@ -47,7 +47,7 @@ internal object AsyncWithObservablesTest {
         .fromIterable(symbols)
         .zipWith(values) { symbol, value -> "$symbol = $value" }
         .sorted()
-        .delay(100, TimeUnit.MILLISECONDS)
+        .delay(100, MILLISECONDS)
         .repeat(3)
         .skipLast(2)
         .subscribe(log::debug)
@@ -60,7 +60,7 @@ internal object AsyncWithObservablesTest {
   fun hitchhikersGuideToTheObservable_3() {
     log.debug("here we go")
 
-    when (4) {
+    when (1) {
       1 -> {
         Observable
             .just(fetchJoke())
@@ -87,14 +87,13 @@ internal object AsyncWithObservablesTest {
 
     log.debug("wait a second...")
     Thread.sleep(1_000)
-
     log.debug("there you are!")
   }
 
   @Test
   fun run() {
     log.debug("here we go")
-    val yokeControl = Semaphore(0)
+    val processControl = Semaphore(0)
 
     val jokeRawO = Observable
         .create<String> { emitter -> emitter.onNext(fetchJoke()) }
@@ -106,16 +105,19 @@ internal object AsyncWithObservablesTest {
         .zipWith(jokeRawO,
             BiFunction { mongoClient: MongoClient, jokeRaw: String ->
               val mongoCollection = getMongoCollection(mongoClient)
-              convertAndStore(jokeRaw, mongoCollection)
+              val joke = convertAndStore(jokeRaw, mongoCollection)
               log.debug("close MongoDB client")
               mongoClient.close()
+              joke
             })
-        .doFinally { yokeControl.release() }
-        .subscribe()
+        .doFinally { processControl.release() }
+        .subscribe(
+            { joke -> log.info("'$joke'") },
+            { t -> log.error("an ERROR occurred", t) }
+        )
 
     log.debug("wait until all is done")
-    yokeControl.tryAcquire(3_000, TimeUnit.MILLISECONDS)
-
+    processControl.tryAcquire(3_000, MILLISECONDS)
     log.debug("there you are!")
   }
 }

@@ -9,7 +9,7 @@ object FetchJokeServiceFlaky {
   private val log = LoggerFactory.getLogger(javaClass)
 
   fun fetchJokeFlaky(): String {
-    return when (Random.nextInt(4)) {
+    return when (Random.nextInt(3)) {
       0 -> {
         log.info("=== throw exception ===")
         throw Exception("EXCEPTION")

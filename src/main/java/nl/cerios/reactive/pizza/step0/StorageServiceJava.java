@@ -35,21 +35,23 @@ class StorageServiceJava {
   // {
   //   "type": "success",
   //   "value": {
-  //     "id": 464,
+  //     "id": 0,
   //     "joke": "...",
-  //     "categories": ["nerdy"]
+  //     "categories": ["-"]
   //   }
   // }
-  static void convertAndStore(final String jokeRaw, final MongoCollection<Document> mongoCollection) {
+  static String convertAndStore(final String jokeRaw, final MongoCollection<Document> mongoCollection) {
     LOG.debug("convert and store joke");
     final Document jokeValue = (Document) Document.parse(jokeRaw).get("value");
+    final String joke = (String) jokeValue.get("joke");
     final Document jokeDocument = new Document()
         .append("at", LocalDateTime.now())
-        .append("joke", jokeValue.get("joke"))
+        .append("joke", joke)
         .append("categories", jokeValue.get("categories"));
 
     mongoCollection.insertOne(jokeDocument);
     LOG.debug("converted and stored joke");
+    return joke;
   }
 
   static void printAllJokes(final MongoCollection<Document> mongoCollection) {

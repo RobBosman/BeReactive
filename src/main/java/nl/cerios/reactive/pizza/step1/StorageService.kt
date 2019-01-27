@@ -32,21 +32,23 @@ object StorageService {
   // {
   //   "type": "success",
   //   "value": {
-  //     "id": 464,
+  //     "id": 0,
   //     "joke": "...",
-  //     "categories": ["nerdy"]
+  //     "categories": ["-"]
   //   }
   // }
-  fun convertAndStore(jokeRaw: String, mongoCollection: MongoCollection<Document>) {
+  fun convertAndStore(jokeRaw: String, mongoCollection: MongoCollection<Document>): String {
     log.debug("convert and store joke")
     val jokeValue = Document.parse(jokeRaw)["value"] as Document
+    val joke = jokeValue["joke"] as String
     val jokeDocument = Document()
         .append("at", LocalDateTime.now())
-        .append("joke", jokeValue["joke"])
+        .append("joke", joke)
         .append("categories", jokeValue["categories"])
 
     mongoCollection.insertOne(jokeDocument)
     log.debug("converted and stored joke")
+    return joke
   }
 
   fun printAllJokes(mongoCollection: MongoCollection<Document>) {
