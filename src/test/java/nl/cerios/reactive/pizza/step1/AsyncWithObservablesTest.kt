@@ -7,7 +7,6 @@ import io.reactivex.schedulers.Schedulers
 import nl.cerios.reactive.pizza.step1.FetchJokeService.fetchJoke
 import nl.cerios.reactive.pizza.step1.StorageService.convertAndStore
 import nl.cerios.reactive.pizza.step1.StorageService.getMongoClient
-import nl.cerios.reactive.pizza.step1.StorageService.getMongoCollection
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture
@@ -19,33 +18,34 @@ internal object AsyncWithObservablesTest {
   private val log = LoggerFactory.getLogger(javaClass)
 
   @Test
-  fun hitchhikersGuideToTheObservable_1() {
+  fun backToTheObservable_1() {
     val words = mutableListOf("hello", "world")
 
     val observable = Observable.fromIterable(words)
 
     observable
-        .subscribe { it -> log.debug("subscriber 1: $it") }
+        .subscribe { word -> log.debug("subscriber 1: $word") }
 
     observable
+        .filter { word -> word.startsWith("h") }
         .map(String::toUpperCase)
-        .filter { it.startsWith("H") }
-        .subscribe { log.debug("subscriber 2: $it") }
+        .subscribe { word -> log.debug("subscriber 2: $word") }
 
     log.debug("make it better")
-    words.add(1, "better")
+    words.add(1, "better") // ["hello", "better", "world"]
 
     observable
-        .subscribe { log.debug("subscriber 3: $it") }
+        .subscribe { word -> log.debug("subscriber 3: $word") }
   }
 
   @Test
-  fun hitchhikersGuideToTheObservable_2() {
-    val symbols = listOf("\u212E", "\u03C0", "\u221E")
+  fun backToTheObservable_2() {
     val values = listOf(Math.E, Math.PI, Double.POSITIVE_INFINITY)
+    val symbols = listOf("\u212E", "\u03C0", "\u221E")
+
     Observable
-        .fromIterable(symbols)
-        .zipWith(values) { symbol, value -> "$symbol = $value" }
+        .fromIterable(values)
+        .zipWith(symbols) { value, symbol -> "$symbol = $value" }
         .sorted()
         .delay(100, MILLISECONDS)
         .repeat(3)
@@ -57,33 +57,26 @@ internal object AsyncWithObservablesTest {
   }
 
   @Test
-  fun hitchhikersGuideToTheObservable_3() {
+  fun backToTheObservable_3() {
     log.debug("here we go")
 
-    when (1) {
-      1 -> {
-        Observable
-            .just(fetchJoke())
-            .subscribe(log::debug)
-      }
-      2 -> {
-        Observable
-            .fromFuture(CompletableFuture.supplyAsync(::fetchJoke))
-            .subscribe(log::debug)
-      }
-      3 -> {
-        Observable
-            .fromFuture(CompletableFuture.supplyAsync(::fetchJoke))
-            .subscribeOn(Schedulers.io())
-            .subscribe(log::debug)
-      }
-      4 -> {
-        Observable
-            .create<String> { emitter -> emitter.onNext(fetchJoke()) }
-            .subscribeOn(Schedulers.io())
-            .subscribe(log::debug)
-      }
-    }
+    Observable
+        .just(fetchJoke())
+        .subscribe { joke -> log.info("observable 1: $joke") }
+
+    Observable
+        .fromFuture(CompletableFuture.supplyAsync(::fetchJoke))
+        .subscribe { joke -> log.info("observable 2: $joke") }
+
+    Observable
+        .fromFuture(CompletableFuture.supplyAsync(::fetchJoke))
+        .subscribeOn(Schedulers.io())
+        .subscribe { joke -> log.info("observable 3: $joke") }
+
+    Observable
+        .create<String> { emitter -> emitter.onNext(fetchJoke()) }
+        .subscribeOn(Schedulers.io())
+        .subscribe { joke -> log.info("observable 4: $joke") }
 
     log.debug("wait a second...")
     Thread.sleep(1_000)
@@ -104,17 +97,15 @@ internal object AsyncWithObservablesTest {
         .subscribeOn(Schedulers.io())
         .zipWith(jokeRawO,
             BiFunction { mongoClient: MongoClient, jokeRaw: String ->
-              val mongoCollection = getMongoCollection(mongoClient)
-              val joke = convertAndStore(jokeRaw, mongoCollection)
-              log.debug("close MongoDB client")
+              val joke = convertAndStore(jokeRaw, mongoClient)
               mongoClient.close()
+              log.debug("closed MongoDB client")
               joke
             })
-        .doFinally { processControl.release() }
-        .subscribe(
-            { joke -> log.info("'$joke'") },
-            { t -> log.error("an ERROR occurred", t) }
-        )
+        .subscribe { joke ->
+          log.info("'$joke'")
+          processControl.release()
+        }
 
     log.debug("wait until all is done")
     processControl.tryAcquire(3_000, MILLISECONDS)

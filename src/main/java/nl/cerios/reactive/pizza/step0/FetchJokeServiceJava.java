@@ -16,7 +16,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 class FetchJokeServiceJava {
 
   private static final Logger LOG = LoggerFactory.getLogger(FetchJokeServiceJava.class);
-  private static final String API_URL = "http://api.icndb.com/jokes/random?limitTo=[nerdy,explicit]"; // Chuck Norris jokes
+  private static final String API_URL = "http://api.icndb.com/jokes/random?limitTo=[explicit,nerdy]"; // Chuck Norris jokes
 
   static String fetchJoke() {
     LOG.debug("fetch joke");

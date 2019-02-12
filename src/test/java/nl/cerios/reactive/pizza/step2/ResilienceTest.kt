@@ -5,7 +5,6 @@ import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import nl.cerios.reactive.pizza.step1.StorageService.convertAndStore
-import nl.cerios.reactive.pizza.step1.StorageService.getMongoCollection
 import nl.cerios.reactive.pizza.step2.FetchJokeServiceFlaky.fetchJokeFlaky
 import nl.cerios.reactive.pizza.step2.StorageServiceFlaky.getMongoClientFlaky
 import org.junit.jupiter.api.Test
@@ -18,13 +17,13 @@ internal object ResilienceTest {
   private val log = LoggerFactory.getLogger(javaClass)
 
   @Test
-  fun hitchhikersGuideToResilience_1() {
+  fun backToResilience() {
     log.debug("here we go")
     val processControl = Semaphore(0)
 
     Single
         .create<String> { emitter -> emitter.onSuccess(fetchJokeFlaky()) }
-        .doOnEvent { s, _ -> if (s == "ERROR") throw Exception("invalid data: $s") }
+        .doOnEvent { jokeRaw, _ -> if (!jokeRaw.contains("success")) throw Exception("invalid data: $jokeRaw") }
         .timeout(200, MILLISECONDS)
         .subscribeOn(Schedulers.io())
         .doOnError { t -> log.warn("error detected: '${t.message}'") }
@@ -32,7 +31,7 @@ internal object ResilienceTest {
         .onErrorResumeNext(Single.just("fallback joke"))
         .doFinally { processControl.release() }
         .subscribe(
-            { joke -> log.info("'$joke'") },
+            { jokeRaw -> log.info("'$jokeRaw'") },
             { t -> log.error("an ERROR occurred", t) }
         )
 
@@ -47,24 +46,23 @@ internal object ResilienceTest {
     val processControl = Semaphore(0)
 
     val jokeRawO = Single
-        .create<String> { emitter -> emitter.onSuccess(fetchJokeFlaky()) }
-        .doOnEvent { s, _ -> if (s == "ERROR") throw Exception("invalid data: $s") }
+        .create<String> { it.onSuccess(fetchJokeFlaky()) }
+        .doOnEvent { jokeRaw, _ -> if (!jokeRaw.contains("success")) throw Exception("invalid data: $jokeRaw") }
         .timeout(200, MILLISECONDS)
         .subscribeOn(Schedulers.io())
         .retry(3)
         .onErrorResumeNext(Single.just("""{ "type": "success", "value": { "joke": "fallback joke" } }"""))
 
     Single
-        .create<MongoClient> { emitter -> emitter.onSuccess(getMongoClientFlaky()) }
-        .timeout(2_000, MILLISECONDS)
+        .create<MongoClient> { it.onSuccess(getMongoClientFlaky()) }
+        .timeout(1_000, MILLISECONDS)
         .subscribeOn(Schedulers.io())
         .retry(2)
         .zipWith(jokeRawO,
             BiFunction { mongoClient: MongoClient, jokeRaw: String ->
-              val mongoCollection = getMongoCollection(mongoClient)
-              val joke = convertAndStore(jokeRaw, mongoCollection)
-              log.debug("close MongoDB client")
+              val joke = convertAndStore(jokeRaw, mongoClient)
               mongoClient.close()
+              log.debug("closed MongoDB client")
               joke
             })
         .doFinally { processControl.release() }
@@ -74,7 +72,7 @@ internal object ResilienceTest {
         )
 
     log.debug("wait until all is done")
-    processControl.tryAcquire(10_000, MILLISECONDS)
+    processControl.tryAcquire(4_000, MILLISECONDS)
     log.debug("there you are!")
   }
 }

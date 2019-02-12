@@ -9,7 +9,7 @@ object FetchJokeServiceFlaky {
   private val log = LoggerFactory.getLogger(javaClass)
 
   fun fetchJokeFlaky(): String {
-    return when (Random.nextInt(3)) {
+    return when (Random.nextInt(4)) {
       0 -> {
         log.info("=== throw exception ===")
         throw Exception("EXCEPTION")
@@ -21,7 +21,7 @@ object FetchJokeServiceFlaky {
       }
       2 -> {
         log.info("=== reply an error ===")
-        "ERROR"
+        "FAILURE"
       }
       else -> {
         log.info("    invoke FetchJokeService")

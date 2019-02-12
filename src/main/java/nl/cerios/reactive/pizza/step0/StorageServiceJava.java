@@ -2,7 +2,6 @@ package nl.cerios.reactive.pizza.step0;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Projections;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -23,24 +22,7 @@ class StorageServiceJava {
     return mongoClient;
   }
 
-  static MongoCollection<Document> getMongoCollection(final MongoClient mongoClient) {
-    LOG.debug("get MongoDB collection");
-    final MongoCollection<Document> mongoCollection = mongoClient
-        .getDatabase("reactive-pizza")
-        .getCollection("jokes");
-    LOG.debug("got MongoDB collection");
-    return mongoCollection;
-  }
-
-  // {
-  //   "type": "success",
-  //   "value": {
-  //     "id": 0,
-  //     "joke": "...",
-  //     "categories": ["-"]
-  //   }
-  // }
-  static String convertAndStore(final String jokeRaw, final MongoCollection<Document> mongoCollection) {
+  static String convertAndStore(final String jokeRaw, final MongoClient mongoClient) {
     LOG.debug("convert and store joke");
     final Document jokeValue = (Document) Document.parse(jokeRaw).get("value");
     final String joke = (String) jokeValue.get("joke");
@@ -49,13 +31,18 @@ class StorageServiceJava {
         .append("joke", joke)
         .append("categories", jokeValue.get("categories"));
 
-    mongoCollection.insertOne(jokeDocument);
+    mongoClient
+        .getDatabase("reactive-pizza")
+        .getCollection("jokes")
+        .insertOne(jokeDocument);
     LOG.debug("converted and stored joke");
     return joke;
   }
 
-  static void printAllJokes(final MongoCollection<Document> mongoCollection) {
-    mongoCollection
+  static void printAllJokes(final MongoClient mongoClient) {
+    mongoClient
+        .getDatabase("reactive-pizza")
+        .getCollection("jokes")
         .find()
         .projection(Projections.excludeId())
         .map(Document::toJson)

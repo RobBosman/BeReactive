@@ -2,7 +2,6 @@ package nl.cerios.reactive.pizza.step1
 
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
-import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.Projections
 import org.bson.Document
 import org.slf4j.LoggerFactory
@@ -20,24 +19,7 @@ object StorageService {
     return mongoClient
   }
 
-  fun getMongoCollection(mongoClient: MongoClient): MongoCollection<Document> {
-    log.debug("get MongoDB collection")
-    val mongoCollection = mongoClient
-        .getDatabase("reactive-pizza")
-        .getCollection("jokes")
-    log.debug("got MongoDB collection")
-    return mongoCollection
-  }
-
-  // {
-  //   "type": "success",
-  //   "value": {
-  //     "id": 0,
-  //     "joke": "...",
-  //     "categories": ["-"]
-  //   }
-  // }
-  fun convertAndStore(jokeRaw: String, mongoCollection: MongoCollection<Document>): String {
+  fun convertAndStore(jokeRaw: String, mongoClient: MongoClient): String {
     log.debug("convert and store joke")
     val jokeValue = Document.parse(jokeRaw)["value"] as Document
     val joke = jokeValue["joke"] as String
@@ -46,13 +28,18 @@ object StorageService {
         .append("joke", joke)
         .append("categories", jokeValue["categories"])
 
-    mongoCollection.insertOne(jokeDocument)
+    mongoClient
+        .getDatabase("reactive-pizza")
+        .getCollection("jokes")
+        .insertOne(jokeDocument)
     log.debug("converted and stored joke")
     return joke
   }
 
-  fun printAllJokes(mongoCollection: MongoCollection<Document>) {
-    mongoCollection
+  fun printAllJokes(mongoClient: MongoClient) {
+    mongoClient
+        .getDatabase("reactive-pizza")
+        .getCollection("jokes")
         .find()
         .projection(Projections.excludeId())
         .map(Document::toJson)

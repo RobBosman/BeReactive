@@ -3,7 +3,6 @@ package nl.cerios.reactive.pizza.step1
 import nl.cerios.reactive.pizza.step1.FetchJokeService.fetchJoke
 import nl.cerios.reactive.pizza.step1.StorageService.convertAndStore
 import nl.cerios.reactive.pizza.step1.StorageService.getMongoClient
-import nl.cerios.reactive.pizza.step1.StorageService.getMongoCollection
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture
@@ -13,24 +12,37 @@ internal object AsyncWithCompletableFuturesTest {
   private val log = LoggerFactory.getLogger(javaClass)
 
   @Test
-  fun hitchhikersGuideToTheCompletableFuture() {
+  fun backToTheCompletableFuture_1() {
+    val findTheAnswerCF = CompletableFuture
+        .supplyAsync {
+          log.debug("pondering...")
+          Thread.sleep(1_500)
+          42
+        }
+
+    log.debug("are you done? - ${findTheAnswerCF.isDone}")
+    log.debug("ah, the answer is ${findTheAnswerCF.get()}.") // blocking wait
+  }
+
+  @Test
+  fun backToTheCompletableFuture_2() {
     val provideAnswerCF = CompletableFuture
         .supplyAsync {
-          log.debug("Determine required processing time")
-          1500L
+          log.debug("determine required processing time")
+          1_500L
         }
         .thenApply { delayMillis ->
-          log.debug("Pondering...")
+          log.debug("pondering...")
           Thread.sleep(delayMillis)
           42
         }
         .thenApply { answer ->
-          log.debug("Got it!")
+          log.debug("got it!")
           answer
         }
 
-    log.debug("Do you know the answer? - ${provideAnswerCF.isDone}")
-    log.debug("Ah, the answer is ${provideAnswerCF.get()}.") // blocking wait
+    log.debug("do you know the answer? - ${provideAnswerCF.isDone}")
+    log.debug("ah, the answer is ${provideAnswerCF.get()}.") // blocking wait
   }
 
   @Test
@@ -42,10 +54,9 @@ internal object AsyncWithCompletableFuturesTest {
     val allDoneCF = CompletableFuture
         .supplyAsync(::getMongoClient)
         .thenCombine(jokeRawCF) { mongoClient, jokeRaw ->
-          val mongoCollection = getMongoCollection(mongoClient)
-          val joke = convertAndStore(jokeRaw, mongoCollection)
-          log.debug("close MongoDB client")
+          val joke = convertAndStore(jokeRaw, mongoClient)
           mongoClient.close()
+          log.debug("closed MongoDB client")
           joke
         }
 
