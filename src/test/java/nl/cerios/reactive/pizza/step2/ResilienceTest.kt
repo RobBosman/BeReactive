@@ -51,7 +51,7 @@ internal object ResilienceTest {
         .timeout(200, MILLISECONDS)
         .subscribeOn(Schedulers.io())
         .retry(3)
-        .onErrorResumeNext(Single.just("""{ "type": "success", "value": { "joke": "fallback joke" } }"""))
+        .onErrorResumeNext(Single.just("""{ "type": "success", "value": { "categories": [], "joke": "fallback joke" } }"""))
 
     Single
         .create<MongoClient> { it.onSuccess(getMongoClientFlaky()) }
