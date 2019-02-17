@@ -12,20 +12,7 @@ internal object AsyncWithCompletableFuturesTest {
   private val log = LoggerFactory.getLogger(javaClass)
 
   @Test
-  fun backToTheCompletableFuture_1() {
-    val findTheAnswerCF = CompletableFuture
-        .supplyAsync {
-          log.debug("pondering...")
-          Thread.sleep(1_500)
-          42
-        }
-
-    log.debug("are you done? - ${findTheAnswerCF.isDone}")
-    log.debug("ah, the answer is ${findTheAnswerCF.get()}.") // blocking wait
-  }
-
-  @Test
-  fun backToTheCompletableFuture_2() {
+  fun backToTheCompletableFuture() {
     val provideAnswerCF = CompletableFuture
         .supplyAsync {
           log.debug("determine required processing time")

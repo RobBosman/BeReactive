@@ -23,9 +23,9 @@ internal object ResilienceTest {
 
     Single
         .create<String> { emitter -> emitter.onSuccess(fetchJokeFlaky()) }
-        .doOnEvent { jokeRaw, _ -> if (!jokeRaw.contains("success")) throw Exception("invalid data: $jokeRaw") }
         .timeout(200, MILLISECONDS)
         .subscribeOn(Schedulers.io())
+        .doOnSuccess { jokeRaw -> if (!jokeRaw.contains("success")) throw Throwable("invalid data: $jokeRaw") }
         .doOnError { t -> log.warn("error detected: '${t.message}'") }
         .retry(3)
         .onErrorResumeNext(Single.just("fallback joke"))
@@ -47,9 +47,9 @@ internal object ResilienceTest {
 
     val jokeRawO = Single
         .create<String> { it.onSuccess(fetchJokeFlaky()) }
-        .doOnEvent { jokeRaw, _ -> if (!jokeRaw.contains("success")) throw Exception("invalid data: $jokeRaw") }
         .timeout(200, MILLISECONDS)
         .subscribeOn(Schedulers.io())
+        .doOnSuccess { jokeRaw -> if (!jokeRaw.contains("success")) throw Throwable("invalid data: $jokeRaw") }
         .retry(3)
         .onErrorResumeNext(Single.just("""{ "type": "success", "value": { "categories": [], "joke": "fallback joke" } }"""))
 
