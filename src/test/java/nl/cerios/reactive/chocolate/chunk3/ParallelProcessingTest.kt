@@ -9,29 +9,28 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.IntStream
 import kotlin.concurrent.thread
 
-internal object CoroutineTest {
+internal object ParallelProcessingTest {
 
   private val log = LoggerFactory.getLogger(javaClass)
-  private const val LOOP_MAX = 50
+  private const val MAX_PARALLEL_PROCESSES = 10
 
   @Test
   fun withThreads() {
     val total = AtomicInteger()
     val startNano = System.nanoTime()
     var endNano = 0L
-    IntStream
-        .range(0, LOOP_MAX)
-        .forEach {
 
-          thread(start = true) {
-            log.debug("performing task")
-            Thread.sleep(1_000)
-            if (total.incrementAndGet() == LOOP_MAX)
-              endNano = System.nanoTime()
-          }
+    IntStream.range(0, MAX_PARALLEL_PROCESSES).forEach {
 
-        }
-    Thread.sleep(2_000)
+      thread(start = true) {
+        log.debug("performing task")
+        Thread.sleep(1_000)
+        if (total.incrementAndGet() == MAX_PARALLEL_PROCESSES)
+          endNano = System.nanoTime()
+      }
+    }
+
+    while (endNano == 0L) Thread.yield()
     log.debug("${total.get()} Thread-tasks took ${endNano.minus(startNano) / 1_000_000} ms")
   }
 
@@ -40,19 +39,17 @@ internal object CoroutineTest {
     val total = AtomicInteger()
     val startNano = System.nanoTime()
     var endNano = 0L
-    IntStream
-        .range(0, LOOP_MAX)
-        .forEach {
+    IntStream.range(0, MAX_PARALLEL_PROCESSES).forEach {
 
-          GlobalScope.launch {
-            log.debug("performing task")
-            delay(1_000)
-            if (total.incrementAndGet() == LOOP_MAX)
-              endNano = System.nanoTime()
-          }
+      GlobalScope.launch {
+        log.debug("performing task")
+        delay(1_000)
+        if (total.incrementAndGet() == MAX_PARALLEL_PROCESSES)
+          endNano = System.nanoTime()
+      }
+    }
 
-        }
-    Thread.sleep(2_000)
+    while (endNano == 0L) Thread.yield()
     log.debug("${total.get()} coroutines-tasks took ${endNano.minus(startNano) / 1_000_000} ms")
   }
 }
