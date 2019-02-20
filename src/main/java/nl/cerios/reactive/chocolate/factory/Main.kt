@@ -14,8 +14,8 @@ fun main() {
       .all(
           deployVerticle(vertx, PeanutProducer::class.java.name),
           deployVerticle(vertx, PeanutSpeedLogger::class.java.name),
-          deployVerticle(vertx, HttpEventServer::class.java.name),
-          deployVerticle(vertx, PeanutSpeedMonitor::class.java.name))
+          deployVerticle(vertx, PeanutSpeedMonitor::class.java.name),
+          deployVerticle(vertx, HttpEventServer::class.java.name))
       .setHandler { result ->
         if (result.succeeded()) {
           log.info("We have hyperdrive, captain.")

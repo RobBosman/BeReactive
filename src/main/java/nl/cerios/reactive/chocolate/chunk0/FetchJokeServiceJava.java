@@ -9,9 +9,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
 
 class FetchJokeServiceJava {
 
@@ -24,7 +24,7 @@ class FetchJokeServiceJava {
       final HttpURLConnection connection = (HttpURLConnection) new URL(API_URL).openConnection();
       try {
         try (final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), UTF_8))) {
-          return reader.lines().collect(Collectors.joining());
+          return reader.lines().collect(joining());
         } catch (IOException e) {
           throw new RuntimeException("Error reading from InputStream", e);
         }
