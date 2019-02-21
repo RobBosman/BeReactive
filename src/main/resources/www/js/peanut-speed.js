@@ -29,6 +29,9 @@ function PeanutSpeed() {
   };
 
   this.updatePeanutSpeed = function(err, msg) {
+  if (msg === false) {
+    return;
+  }
     var intensityPercentage = 100.0 * msg.body.value;
     document.getElementById('peanut-speed-percentage').innerHTML = intensityPercentage.toFixed(0) + "%";
     if (msg.headers == null || msg.headers.id != ID) {

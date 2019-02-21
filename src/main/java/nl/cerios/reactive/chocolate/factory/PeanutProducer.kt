@@ -10,7 +10,7 @@ import java.security.SecureRandom
 class PeanutProducer : AbstractVerticle() {
 
   private val log = LoggerFactory.getLogger(javaClass)
-  private val maxIntervalMillis = 3_000.0
+  private val maxIntervalMillis = 10_000.0
 
   override fun start() {
     vertx.eventBus()
@@ -28,15 +28,14 @@ class PeanutProducer : AbstractVerticle() {
 
   private fun createPeanutObservable(intervalMillis: Long): Observable<out Peanut> {
     return if (intervalMillis < maxIntervalMillis) {
-      Observable.create<Peanut> { subscriber -> createDelayedPeanut(intervalMillis, subscriber) }
+      Observable.create<Peanut> { createDelayedPeanut(intervalMillis, it) }
     } else {
       Observable.never<Peanut>()
     }
   }
 
   private fun createDelayedPeanut(intervalMillis: Long, subscriber: Subscriber<in Peanut>) {
-    val delayMillis = sampleDelayMillis(intervalMillis)
-    vertx.setTimer(delayMillis) {
+    vertx.setTimer(intervalMillis.halfToDouble()) {
       if (!subscriber.isUnsubscribed) {
         subscriber.onNext(Peanut())
         createDelayedPeanut(intervalMillis, subscriber)
@@ -48,8 +47,6 @@ class PeanutProducer : AbstractVerticle() {
     val effectiveIntensity = Math.min(Math.max(0.0, intensity), 1.0)
     return Math.round(Math.pow(Math.E, Math.log(maxIntervalMillis) * (1.0 - effectiveIntensity)))
   }
-
-  private fun sampleDelayMillis(intervalMillis: Long): Long {
-    return Math.max(1, Math.round(2.0 * SecureRandom().nextDouble() * intervalMillis))
-  }
 }
+
+fun Long.halfToDouble() = Math.max(1, Math.round(this * (0.5 + 1.5 * SecureRandom().nextDouble())))

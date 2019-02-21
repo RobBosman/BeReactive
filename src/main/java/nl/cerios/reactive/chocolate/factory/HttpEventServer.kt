@@ -18,6 +18,9 @@ class HttpEventServer : AbstractVerticle() {
 
     val router = Router.router(vertx)
 
+    router.route()
+        .handler(StaticHandler.create("www").setIndexPage("chocolateFactory.html"))
+
     router.route("/eventbus/*")
         .handler(SockJSHandler.create(vertx)
             .bridge(BridgeOptions()
@@ -25,9 +28,6 @@ class HttpEventServer : AbstractVerticle() {
                 .addInboundPermitted(PermittedOptions().setAddress("peanut.speed.set"))
                 .addOutboundPermitted(PermittedOptions().setAddress("peanut.notify"))
                 .addOutboundPermitted(PermittedOptions().setAddress("peanut.speed.set"))))
-
-    router.route()
-        .handler(StaticHandler.create("www").setIndexPage("chocolateFactory.html"))
 
     vertx.createHttpServer()
         .requestHandler(router)

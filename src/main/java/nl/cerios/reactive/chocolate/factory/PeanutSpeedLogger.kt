@@ -16,6 +16,6 @@ class PeanutSpeedLogger : AbstractVerticle() {
         .debounce(200, MILLISECONDS)
         .map<JsonObject> { it.body() }
         .map { Math.floor(it.getDouble("value") * 100.0) }
-        .subscribe { percentage -> log.debug("Peanut production speed: $percentage%") }
+        .subscribe { log.debug("Peanut production speed: $it%") }
   }
 }

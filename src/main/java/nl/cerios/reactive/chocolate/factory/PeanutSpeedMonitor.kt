@@ -13,7 +13,7 @@ class PeanutSpeedMonitor : AbstractVerticle() {
             .consumer<JsonObject>("peanut.speed.set")
             .toObservable()
             .map { it.body() }
-            .map { jsonObject -> jsonObject.getDouble("value") }
+            .map { it.getDouble("value") }
         ) { speedRequest, actualSpeed -> speedRequest.reply(JsonObject().put("value", actualSpeed)) }
         .subscribe()
   }

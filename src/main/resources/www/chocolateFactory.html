@@ -9,18 +9,124 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/vertx/3.6.3/vertx-eventbus.min.js"></script>
   <script src="/js/nouislider.min.js"></script>
 
-  <link href="/css/tile-with-peanuts.css" rel="stylesheet" type="text/css">
   <link href="/css/peanut-speed.css" rel="stylesheet" type="text/css">
-  <link href="/css/randomness-statistics.css" rel="stylesheet" type="text/css">
-  <link href="/css/pi-approximation.css" rel="stylesheet" type="text/css">
   <link href="/css/chocolateFactory.css" rel="stylesheet" type="text/css">
 </head>
+
+
+<style type='text/css'>
+.peanut {
+  top: 60px;
+  width: 36px;
+  height: 17px;
+  position: absolute;
+  z-index: 1;
+  background-image: url("./img/peanut.png");
+  background-size: cover;
+  animation: peanutOnBelt 8s linear forwards;
+}
+@keyframes peanutOnBelt {
+  0%   {top:  0px; transform: rotate(   0deg);}
+  100% {top:800px; transform: rotate(1440deg);}
+}
+.beingConsumed {
+  width: 36px;
+  height: 17px;
+  position: relative;
+  background-image: url("/img/peanut.png");
+  background-size: cover;
+  animation: peanutBeingConsumed 1s linear forwards;
+}
+@keyframes peanutBeingConsumed {
+  0%   {left:  0px;}
+  100% {left: 80px;}
+}
+
+.progress {
+  position: relative;
+  left: 100px;
+  width: 35px;
+  height: 5px;
+  border: 1px solid green;
+  background-color: lightGreen;
+}
+.progressBar {
+  width: 0%;
+  height: 100%;
+  background-color: red;
+  animation: progressBar 2s linear;
+}
+@keyframes progressBar {
+  100% {width: 100%;}
+}
+
+.worker {
+  width:  200px;
+  height: 200px;
+  background-image: url("/img/golem.png");
+  background-size: cover;
+}
+
+.golem {
+  position: relative;
+  left: 70px;
+  top: 100px;
+}
+
+</style>
+
+<script language="javascript">
+function produceItem(conveyorBeltID, className) {
+  var conveyorBelt = document.getElementById(conveyorBeltID);
+  var item = document.createElement('div');
+  item.className = className;
+  conveyorBelt.appendChild(item);
+  setTimeout(
+	  function(){
+	    if (item.className === className) {
+	      consumeItem(item, 2000);
+	    }
+	  },
+    1000);
+  setTimeout(function(){
+      if (item.className === className) {
+        conveyorBelt.removeChild(item);
+      }
+    },
+    5000);
+}
+
+function consumeItem(item, duration) {
+  var workers = document.querySelectorAll('.worker');
+  for (w = 0; w < workers.length; w++) {
+    var worker = workers[w];
+    var progressNodes = worker.querySelectorAll('.progress');
+    for (p = progressNodes.length - 1; p >= 0; p--) {
+	    var progressNode = progressNodes[p];
+      if (progressNode.children.length == 0) {
+        worker.appendChild(item.parentElement.removeChild(item));
+        item.className = 'beingConsumed';
+        setTimeout(function(){
+          item.parentElement.removeChild(item);
+          item.className = 'progressBar';
+          item.style.animationDuration = duration + "ms";
+          progressNode.appendChild(item);
+          setTimeout(function(){
+            progressNode.removeChild(item);
+          }, duration);
+        }, 800);
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+
+</script>
+
 <body>
 <h1>Reactive Chocolate Factory</h1>
-
-<div class="main" id="tile-with-peanuts">
-  <svg id="tile-with-peanuts-svg" xmlns="http://www.w3.org/2000/svg"></svg>
-</div>
 
 <div class="main" id="peanut-speed"></div>
 
@@ -36,57 +142,22 @@
   </table>
 </div>
 
-<div class="main" id="pi-approximation">
-  <table width="100%">
-    <tr>
-      <td>total number of peanut</td>
-      <td class="value">
-        <div id="num-drops"></div>
-      </td>
-    </tr>
-    <tr>
-      <td>number of peanuts with <i>d</i> &le; 1</td>
-      <td class="value">
-        <div id="num-within-radius"></div>
-      </td>
-    </tr>
-    <tr>
-      <td>approximation of &pi;</td>
-      <td class="value">
-        <div id="pi"></div>
-      </td>
-    </tr>
-  </table>
-</div>
-
-<div class="main" id="randomness-statistics">
-  <table width="100%">
-    <tr>
-      <td>average x</td>
-      <td class="value">
-        <div id="average-x"></div>
-      </td>
-    </tr>
-    <tr>
-      <td>average y</td>
-      <td class="value">
-        <div id="average-y"></div>
-      </td>
-    </tr>
-    <tr>
-      <td>correlation coefficient</td>
-      <td class="value">
-        <div id="correlation-coefficient"></div>
-      </td>
-    </tr>
-  </table>
+<div class="main">
+  <div id="conveyorBelt"></div>
+  <div class="worker" id="1">
+    <div class="progress"></div>
+    <div class="progress"></div>
+    <div class="golem"></div>
+  </div>
+  <div class="worker" id="2">
+    <div class="progress"></div>
+    <div class="progress"></div>
+    <div class="golem"></div>
+  </div>
 </div>
 
 <script src="/js/future.js"></script>
-<script src="/js/tile-with-peanuts.js"></script>
 <script src="/js/peanut-speed.js"></script>
-<script src="/js/randomness-statistics.js"></script>
-<script src="/js/pi-approximation.js"></script>
 <script src="/js/chocolateFactory.js"></script>
 
 </body>
