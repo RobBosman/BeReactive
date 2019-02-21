@@ -11,20 +11,19 @@ private val log = LoggerFactory.getLogger("nl.cerios.reactive.chocolate.factory.
 fun main() {
   val vertx = Vertx.vertx()
 
-  val firstBatch = CompositeFuture.all(
-      deployVerticle(vertx, PeanutPooper::class.java.name),
-      deployVerticle(vertx, Chocolatifier::class.java.name),
-      deployVerticle(vertx, Painter::class.java.name),
-      deployVerticle(vertx, LetterStamper::class.java.name),
-      deployVerticle(vertx, MnMPackager::class.java.name))
-
-  val secondBatch = CompositeFuture.all(
-      deployVerticle(vertx, PeanutSpeedLogger::class.java.name),
-      deployVerticle(vertx, HttpEventServer::class.java.name))
-
   CompositeFuture
-      .all(firstBatch, secondBatch)
-      .setHandler { result: AsyncResult<CompositeFuture> ->
+      .all(
+          CompositeFuture.all(
+              deployVerticle(vertx, PeanutPooper::class.java.name),
+              deployVerticle(vertx, Chocolatifier::class.java.name),
+              deployVerticle(vertx, Painter::class.java.name),
+              deployVerticle(vertx, LetterStamper::class.java.name),
+              deployVerticle(vertx, MnMPackager::class.java.name)),
+          CompositeFuture.all(
+              deployVerticle(vertx, PeanutSpeedLogger::class.java.name),
+              deployVerticle(vertx, HttpEventServer::class.java.name))
+      )
+      .setHandler { result ->
         if (result.succeeded()) {
           log.info("We have hyperdrive, captain.")
         } else {
