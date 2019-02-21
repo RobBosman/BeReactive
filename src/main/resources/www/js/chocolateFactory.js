@@ -8,7 +8,7 @@ eventBus.onopen = whenEventBusIsOpen.completed;
 
 whenEventBusIsOpen
     .thenDo(function() {
-      eventBus.registerHandler('peanut.notify', function(){ produceItem('conveyorBelt', 'peanut'); });
+      eventBus.registerHandler('peanut', function(){ produceItem('conveyorBelt', 'peanut'); });
     });
 
 new CompositeFuture()

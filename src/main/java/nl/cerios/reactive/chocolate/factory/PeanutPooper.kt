@@ -7,7 +7,7 @@ import rx.Observable
 import rx.Subscriber
 import java.security.SecureRandom
 
-class PeanutProducer : AbstractVerticle() {
+class PeanutPooper : AbstractVerticle() {
 
   private val log = LoggerFactory.getLogger(javaClass)
   private val maxIntervalMillis = 10_000.0
@@ -22,7 +22,7 @@ class PeanutProducer : AbstractVerticle() {
         .switchMap { createPeanutObservable(it) }
         .map { it.toJson() }
         .subscribe(
-            { peanutJson -> vertx.eventBus().publish("peanut.notify", peanutJson) },
+            { peanutJson -> vertx.eventBus().publish("peanut", peanutJson) },
             { throwable -> log.error("Error producing peanuts.", throwable) })
   }
 
@@ -35,7 +35,7 @@ class PeanutProducer : AbstractVerticle() {
   }
 
   private fun createDelayedPeanut(intervalMillis: Long, subscriber: Subscriber<in Peanut>) {
-    vertx.setTimer(intervalMillis.halfToDouble()) {
+    vertx.setTimer(intervalMillis.timesHalfToTwo()) {
       if (!subscriber.isUnsubscribed) {
         subscriber.onNext(Peanut())
         createDelayedPeanut(intervalMillis, subscriber)
@@ -49,4 +49,4 @@ class PeanutProducer : AbstractVerticle() {
   }
 }
 
-fun Long.halfToDouble() = Math.max(1, Math.round(this * (0.5 + 1.5 * SecureRandom().nextDouble())))
+fun Long.timesHalfToTwo() = Math.max(1, Math.round(this * (0.5 + 1.5 * SecureRandom().nextDouble())))

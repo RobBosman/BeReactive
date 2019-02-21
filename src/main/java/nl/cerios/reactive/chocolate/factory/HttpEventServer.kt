@@ -26,7 +26,7 @@ class HttpEventServer : AbstractVerticle() {
             .bridge(BridgeOptions()
                 .addInboundPermitted(PermittedOptions().setAddress("peanut.speed.get"))
                 .addInboundPermitted(PermittedOptions().setAddress("peanut.speed.set"))
-                .addOutboundPermitted(PermittedOptions().setAddress("peanut.notify"))
+                .addOutboundPermitted(PermittedOptions().setAddress("peanut"))
                 .addOutboundPermitted(PermittedOptions().setAddress("peanut.speed.set"))))
 
     vertx.createHttpServer()
