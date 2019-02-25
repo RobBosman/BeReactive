@@ -1,25 +1,32 @@
 # Reactive Chocolate
 ### about creating reactive software
 
-
 This repo contains a Java (Kotlin!) server application and an HTML client to demonstrate the usage of
 * async programming with Futures and CompletableFutures
-* RxObservables ([RxJava](http://reactivex.io/))
+* Rx Observables ([RxJava](http://reactivex.io/))
 * Rx-ified API of Vert.x (`io.vertx.rxjava.*`)
-* (Project Reactor, Flux API of JDK 9)
 
-Here is [my presentation](https://slides.com/robbosman/reactive#/) that goes along with the code.
+[Here](https://slides.com/robbosman/reactive#/) is my presentation that goes along with the code.
 
+![golem](https://raw.githubusercontent.com/Cerios/ReactiveChocolate/master/src/main/resources/www/img/golem.png "'functor'")
 
-More useful links:
+### development environment
+This is what I did to set-up the development environment:
+* install [Java JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html) version 8 or higher
+* install [IntelliJ IDEA](https://www.jetbrains.com/idea/) (Community edition is fine)
+* enable [Kotlin plugin](https://www.jetbrains.com/help/idea/kotlin.html) in IntelliJ IDEA
+* install [MongoDB Comminuty server](https://www.mongodb.com/download-center) (Atlas Cloud Database works too)
+* install [MongoDB Compass](https://www.mongodb.com/products/compass) (not required, but comes in handy)
+
+### useful links
 * [Coursera - Kotlin for Java Developers](https://www.coursera.org/learn/kotlin-for-java-developers)
-* [The introduction to Reactive Programming you've been missing](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754)
 * [ReactiveX](http://reactivex.io/)
-* [Project Reactor](https://projectreactor.io/)
 * [Reactive Streams](http://www.reactive-streams.org/)
 * [Vert.x](https://vertx.io/)
+* [Project Reactor](https://projectreactor.io/)
 
-Good reads:
-* [Why you should totally switch to Kotlin](https://medium.com/@magnus.chatt/why-you-should-totally-switch-to-kotlin-c7bbde9e10d5)
+### good reads
+* [Andre Staltz - _The introduction to Reactive Programming you've been missing_](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754)
 * [Red Hat - _Building Reactive Microservices in Java_](https://developers.redhat.com/promotions/building-reactive-microservices-in-java/)
-* [Ted Chiang - _The Story of your Life and Others_](https://www.bol.com/nl/p/stories-of-your-life-and-others/9200000038558625/)
+* [Magnus Vinther - _Why you should totally switch to Kotlin_](https://medium.com/@magnus.chatt/why-you-should-totally-switch-to-kotlin-c7bbde9e10d5)
+* [Ted Chiang - _The Story of your Life and Others_](https://www.bol.com/nl/p/stories-of-your-life-and-others/9200000038558625/), short story _"Seventy-two Letters"_
