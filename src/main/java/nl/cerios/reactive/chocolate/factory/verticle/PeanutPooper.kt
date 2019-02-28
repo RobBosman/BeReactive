@@ -1,11 +1,12 @@
-package nl.cerios.reactive.chocolate.factory
+package nl.cerios.reactive.chocolate.factory.verticle
 
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
+import nl.cerios.reactive.chocolate.factory.model.Peanut
+import nl.cerios.reactive.chocolate.factory.timesHalfToTwo
 import org.slf4j.LoggerFactory
 import rx.Observable
 import rx.Subscriber
-import java.security.SecureRandom
 
 class PeanutPooper : AbstractVerticle() {
 
@@ -16,11 +17,10 @@ class PeanutPooper : AbstractVerticle() {
     vertx.eventBus()
         .consumer<JsonObject>("peanut.speed.set")
         .toObservable()
-        .map<JsonObject> { it.body() }
-        .map { it.getDouble("value") }
-        .map<Long> { intensityToIntervalMillis(it) }
-        .switchMap { createPeanutObservable(it) }
-        .map { it.toJson() }
+        .map { json -> json.body().getDouble("value") }
+        .map { intensity -> intensityToIntervalMillis(intensity) }
+        .switchMap { intervalMillis -> createPeanutObservable(intervalMillis) }
+        .map { peanut -> peanut.toJson() }
         .subscribe(
             { peanutJson -> vertx.eventBus().publish("peanut", peanutJson) },
             { throwable -> log.error("Error producing peanuts.", throwable) })
@@ -48,5 +48,3 @@ class PeanutPooper : AbstractVerticle() {
     return Math.round(Math.pow(Math.E, Math.log(maxIntervalMillis) * (1.0 - effectiveIntensity)))
   }
 }
-
-fun Long.timesHalfToTwo() = Math.max(1, Math.round(this * (0.5 + 1.5 * SecureRandom().nextDouble())))

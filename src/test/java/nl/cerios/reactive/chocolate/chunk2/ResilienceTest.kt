@@ -26,7 +26,7 @@ internal object ResilienceTest {
         .timeout(200, MILLISECONDS)
         .subscribeOn(Schedulers.io())
         .doOnSuccess { jokeRaw -> if (!jokeRaw.contains("success")) throw Throwable("invalid data: $jokeRaw") }
-        .doOnError { t -> log.warn("error detected: '${t.message}'", t) }
+        .doOnError { t -> log.warn("error detected: '${t.message}'") }
         .retry(3)
         .onErrorResumeNext(Single.just("fallback joke"))
         .doFinally { processControl.release() }

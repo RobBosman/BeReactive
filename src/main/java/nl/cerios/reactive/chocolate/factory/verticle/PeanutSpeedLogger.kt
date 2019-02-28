@@ -1,4 +1,4 @@
-package nl.cerios.reactive.chocolate.factory
+package nl.cerios.reactive.chocolate.factory.verticle
 
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
@@ -14,8 +14,7 @@ class PeanutSpeedLogger : AbstractVerticle() {
         .consumer<JsonObject>("peanut.speed.set")
         .toObservable()
         .debounce(200, MILLISECONDS)
-        .map<JsonObject> { it.body() }
-        .map { Math.floor(it.getDouble("value") * 100.0) }
-        .subscribe { log.debug("Peanut production speed: $it%") }
+        .map { json -> Math.floor(json.body().getDouble("value") * 100.0) }
+        .subscribe { percentage -> log.debug("Peanut production speed: $percentage%") }
   }
 }

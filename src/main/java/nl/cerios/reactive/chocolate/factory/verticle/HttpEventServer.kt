@@ -1,4 +1,4 @@
-package nl.cerios.reactive.chocolate.factory
+package nl.cerios.reactive.chocolate.factory.verticle
 
 import io.vertx.core.Future
 import io.vertx.ext.bridge.PermittedOptions
