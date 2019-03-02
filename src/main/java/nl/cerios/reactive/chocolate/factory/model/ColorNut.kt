@@ -8,13 +8,10 @@ internal data class ColorNut(
     private val color: Color) {
 
   companion object {
-    fun fromJson(json: JsonObject): ColorNut {
-      return ColorNut(ChocoNut.fromJson(json), Color.valueOf(json.getString("color")))
-    }
+    fun fromJson(json: JsonObject): ColorNut =
+        ColorNut(ChocoNut.fromJson(json), Color.valueOf(json.getString("color")))
   }
 
-  fun toJson(): JsonObject {
-    return chocoNut.toJson()
-        .put("color", color)
-  }
+  fun toJson(): JsonObject = chocoNut.toJson()
+      .put("color", color)
 }

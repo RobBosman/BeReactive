@@ -1,20 +1,23 @@
 "use strict";
 
 var eventBus = new EventBus('/eventbus');
-var peanutSpeed = new PeanutSpeed();
+var peanutPace = new PeanutPace();
 
 window.onload = whenDomIsReady.completed;
 eventBus.onopen = whenEventBusIsOpen.completed;
 
 whenEventBusIsOpen
     .thenDo(function() {
-      eventBus.registerHandler('peanut', function(){ produceItem('conveyorBelt', 'peanut'); });
+      eventBus.registerHandler('peanut', function() {
+         var peanut = produceItem('conveyorBelt', 'peanut');
+         peanut.style.transform = "rotate(" + (Math.random() * 360) + "deg)";
+       });
     });
 
 new CompositeFuture()
     .and(whenSliderIsReady)
     .and(whenEventBusIsOpen)
     .thenDo(function() {
-      eventBus.registerHandler('peanut.speed.set', '', peanutSpeed.updatePeanutSpeed);
-      eventBus.send('peanut.speed.get', '', peanutSpeed.updatePeanutSpeed);
+      eventBus.registerHandler('peanut.pace.set', '', peanutPace.updatePeanutPace);
+      eventBus.send('peanut.pace.get', '', peanutPace.updatePeanutPace);
     });

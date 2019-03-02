@@ -5,6 +5,7 @@ import io.vertx.rxjava.core.AbstractVerticle
 import nl.cerios.reactive.chocolate.factory.model.ChocoNut
 import nl.cerios.reactive.chocolate.factory.model.Peanut
 import nl.cerios.reactive.chocolate.factory.timesHalfToTwo
+import nl.cerios.reactive.chocolate.factory.toObservable
 import org.slf4j.LoggerFactory
 import java.security.SecureRandom
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -14,7 +15,7 @@ enum class Flavor { PURE, MILK, WHITE }
 class Chocolatifier : AbstractVerticle() {
 
   private val log = LoggerFactory.getLogger(javaClass)
-  private val processingTime = 2000L
+  private val processingTime = 2_000L
 
   override fun start() {
     vertx.eventBus()

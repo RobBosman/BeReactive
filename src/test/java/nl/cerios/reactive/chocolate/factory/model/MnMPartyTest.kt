@@ -9,9 +9,9 @@ internal class MnMPartyTest {
 
   @Test
   fun json() {
-    val mnm1 = createMnM(0.25F, Flavor.MILK, Color.YELLOW)
-    val mnm2 = createMnM(0.35F, Flavor.PURE, Color.GREEN)
-    val mnm3 = createMnM(0.45F, Flavor.WHITE, Color.RED)
+    val mnm1 = createMnM(0.25, Flavor.MILK, Color.YELLOW)
+    val mnm2 = createMnM(0.35, Flavor.PURE, Color.GREEN)
+    val mnm3 = createMnM(0.45, Flavor.WHITE, Color.RED)
     val mnms = listOf(mnm1, mnm2, mnm3, mnm1, mnm2)
 
     val mnmParty1 = MnMParty(mnms)
@@ -21,5 +21,5 @@ internal class MnMPartyTest {
     Assertions.assertEquals("""{"content":5}""", json.encode())
   }
 
-  private fun createMnM(quality: Float, flavor: Flavor, color: Color): MnM = MnM(ColorNut(ChocoNut(Peanut(quality), flavor), color))
+  private fun createMnM(quality: Double, flavor: Flavor, color: Color): MnM = MnM(ColorNut(ChocoNut(Peanut(quality), flavor), color))
 }

@@ -14,7 +14,7 @@ enum class Color { GREEN, YELLOW, BLUE, RED, ORANGE }
 class Painter : AbstractVerticle() {
 
   private val log = LoggerFactory.getLogger(javaClass)
-  private val processingTime = 1000L
+  private val processingTime = 1_000L
 
   override fun start() {
     vertx.eventBus()

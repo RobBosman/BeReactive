@@ -9,7 +9,7 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/vertx/3.6.3/vertx-eventbus.min.js"></script>
   <script src="/js/nouislider.min.js"></script>
 
-  <link href="/css/peanut-speed.css" rel="stylesheet" type="text/css">
+  <link href="/css/peanut-pace.css" rel="stylesheet" type="text/css">
   <link href="/css/chocolateFactory.css" rel="stylesheet" type="text/css">
 </head>
 
@@ -26,8 +26,8 @@
   animation: peanutOnBelt 8s linear forwards;
 }
 @keyframes peanutOnBelt {
-  0%   {top:  60px; transform: rotate(   0deg);}
-  100% {top:800px; transform: rotate(1440deg);}
+    0% {top:  60px;}
+  100% {top: 800px; transform: rotate(4turn);}
 }
 .beingConsumed {
   width: 36px;
@@ -72,12 +72,6 @@
   left: 70px;
   top: 100px;
 }
-
-
-
-
-
-
 </style>
 
 <script language="javascript">
@@ -99,6 +93,7 @@ function produceItem(conveyorBeltID, className) {
       }
     },
     5000);
+  return item;
 }
 
 function consumeItem(item, duration) {
@@ -110,6 +105,7 @@ function consumeItem(item, duration) {
 	    var progressNode = progressNodes[p];
       if (progressNode.children.length == 0) {
         worker.appendChild(item.parentElement.removeChild(item));
+        item.style.transform = "rotate(0)";
         item.className = 'beingConsumed';
         setTimeout(function(){
           item.parentElement.removeChild(item);
@@ -126,26 +122,19 @@ function consumeItem(item, duration) {
   }
   return false;
 }
-
-
-
-
-
-
-
 </script>
 
 <body>
 <h1>Reactive Chocolate Factory</h1>
 
-<div class="main" id="peanut-speed"></div>
+<div class="main" id="peanut-pace"></div>
 
-<div class="main" id="peanut-speed-value">
+<div class="main" id="peanut-pace-value">
   <table width="100%">
     <tr>
-      <td>peanut speed</td>
+      <td>peanut pace</td>
       <td class="value">
-        <div id="peanut-speed-percentage"></div>
+        <div id="peanut-pace-percentage"></div>
       </td>
     </tr>
     <tr>
@@ -156,18 +145,16 @@ function consumeItem(item, duration) {
   <div id="conveyorBelt"></div>
   <div class="worker" id="1">
     <div class="progress"></div>
-    <div class="progress"></div>
     <div class="golem"></div>
   </div>
   <div class="worker" id="2">
-    <div class="progress"></div>
     <div class="progress"></div>
     <div class="golem"></div>
   </div>
 </div>
 
 <script src="/js/future.js"></script>
-<script src="/js/peanut-speed.js"></script>
+<script src="/js/peanut-pace.js"></script>
 <script src="/js/chocolateFactory.js"></script>
 
 </body>

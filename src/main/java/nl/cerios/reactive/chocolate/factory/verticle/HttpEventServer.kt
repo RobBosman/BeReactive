@@ -24,10 +24,10 @@ class HttpEventServer : AbstractVerticle() {
     router.route("/eventbus/*")
         .handler(SockJSHandler.create(vertx)
             .bridge(BridgeOptions()
-                .addInboundPermitted(PermittedOptions().setAddress("peanut.speed.get"))
-                .addInboundPermitted(PermittedOptions().setAddress("peanut.speed.set"))
+                .addInboundPermitted(PermittedOptions().setAddress("peanut.pace.get"))
+                .addInboundPermitted(PermittedOptions().setAddress("peanut.pace.set"))
                 .addOutboundPermitted(PermittedOptions().setAddress("peanut"))
-                .addOutboundPermitted(PermittedOptions().setAddress("peanut.speed.set"))))
+                .addOutboundPermitted(PermittedOptions().setAddress("peanut.pace.set"))))
 
     vertx.createHttpServer()
         .requestHandler(router)

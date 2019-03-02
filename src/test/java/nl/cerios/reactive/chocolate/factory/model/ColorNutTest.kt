@@ -9,7 +9,7 @@ internal class ColorNutTest {
 
   @Test
   fun json() {
-    val quality = 0.25F
+    val quality = 0.25
     val flavor = Flavor.MILK
     val color = Color.YELLOW
 

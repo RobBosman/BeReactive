@@ -5,8 +5,6 @@ import io.vertx.core.json.JsonObject
 internal data class MnMParty(
     private val mnms: List<MnM>) {
 
-  fun toJson(): JsonObject {
-    return JsonObject()
-        .put("content", mnms.size)
-  }
+  fun toJson(): JsonObject = JsonObject()
+      .put("content", mnms.size)
 }
