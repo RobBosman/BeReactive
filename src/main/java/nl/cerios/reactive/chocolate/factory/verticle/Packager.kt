@@ -20,7 +20,6 @@ class Packager : AbstractVerticle() {
     vertx.eventBus()
         .consumer<JsonObject>("mnm")
         .toObservable()
-        .logIt(log)
         .map { json -> MnM.fromJson(json.body()) }
         .window(collectAfterMillis, collectAfterMillis, MILLISECONDS, numMnMs, Schedulers.computation())
         .flatMap { mnms -> mnms.toList() }

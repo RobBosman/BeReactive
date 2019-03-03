@@ -1,5 +1,7 @@
 "use strict";
 
+var whenSliderIsReady = new Future();
+
 function PeanutPace() {
 
   var ID = Math.random().toFixed(10);

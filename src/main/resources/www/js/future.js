@@ -46,5 +46,4 @@ function CompositeFuture() {
 }
 
 var whenDomIsReady = new Future();
-var whenEventBusIsOpen = new Future();
-var whenSliderIsReady = new Future();
+window.onload = whenDomIsReady.completed;

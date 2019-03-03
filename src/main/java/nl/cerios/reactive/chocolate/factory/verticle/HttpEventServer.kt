@@ -18,7 +18,7 @@ class HttpEventServer : AbstractVerticle() {
     val router = Router.router(vertx)
 
     router.route()
-        .handler(StaticHandler.create("www").setIndexPage("chocolateFactory.html"))
+        .handler(StaticHandler.create("www").setIndexPage("chocolate-factory.html"))
 
     router.route("/eventbus/*")
         .handler(SockJSHandler.create(vertx)

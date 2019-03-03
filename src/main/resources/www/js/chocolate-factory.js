@@ -3,7 +3,7 @@
 var eventBus = new EventBus('/eventbus');
 var peanutPace = new PeanutPace();
 
-window.onload = whenDomIsReady.completed;
+var whenEventBusIsOpen = new Future();
 eventBus.onopen = whenEventBusIsOpen.completed;
 
 whenEventBusIsOpen
