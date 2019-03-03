@@ -87,7 +87,7 @@ object Main {
 
 fun Long.timesHalfToTwo() = Math.round(this * (0.5 + 1.5 * SecureRandom().nextDouble()))
 
-fun <T> Observable<T>.delayRandomized(averageDelayMillis: Long): Observable<T> =
+fun <T> Observable<T>.delayRandomly(averageDelayMillis: Long): Observable<T> =
     delay { item ->
       Observable.create<T> { emitter -> emitter.onNext(item) }
           .delay(averageDelayMillis.timesHalfToTwo(), TimeUnit.MILLISECONDS)

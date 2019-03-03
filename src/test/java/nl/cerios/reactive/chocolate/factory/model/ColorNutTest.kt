@@ -18,7 +18,7 @@ internal class ColorNutTest {
     val json = colorNut1.toJson()
     val colorNut2 = ColorNut.fromJson(json)
 
-    assertEquals(quality, json.getFloat("quality"))
+    assertEquals(quality, json.getDouble("quality"))
     assertEquals(flavor.name, json.getString("flavor"))
     assertEquals(color.name, json.getString("color"))
     assertEquals("""{"quality":0.25,"flavor":"MILK","color":"YELLOW"}""", json.encode())

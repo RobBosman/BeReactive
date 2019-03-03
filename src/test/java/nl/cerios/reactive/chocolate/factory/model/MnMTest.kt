@@ -18,7 +18,7 @@ internal class MnMTest {
     val json = mnm1.toJson()
     val mnm2 = MnM.fromJson(json)
 
-    assertEquals(quality, json.getFloat("quality"))
+    assertEquals(quality, json.getDouble("quality"))
     assertEquals(flavor.name, json.getString("flavor"))
     assertEquals(color.name, json.getString("color"))
     assertEquals("""{"quality":0.25,"flavor":"MILK","color":"YELLOW"}""", json.encode())

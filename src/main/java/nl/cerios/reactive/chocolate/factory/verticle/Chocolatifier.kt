@@ -2,7 +2,7 @@ package nl.cerios.reactive.chocolate.factory.verticle
 
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
-import nl.cerios.reactive.chocolate.factory.delayRandomized
+import nl.cerios.reactive.chocolate.factory.delayRandomly
 import nl.cerios.reactive.chocolate.factory.model.ChocoNut
 import nl.cerios.reactive.chocolate.factory.model.Peanut
 import org.slf4j.LoggerFactory
@@ -21,7 +21,7 @@ class Chocolatifier : AbstractVerticle() {
         .consumer<JsonObject>("peanut")
         .toObservable()
         .map { json -> Peanut.fromJson(json.body()) }
-        .delayRandomized(processingMillis)
+        .delayRandomly(processingMillis)
         .map { peanut -> ChocoNut(peanut, chooseFlavor()).toJson() }
         .subscribe(
             { chocoNutJson -> vertx.eventBus().publish("chocoNut", chocoNutJson) },
