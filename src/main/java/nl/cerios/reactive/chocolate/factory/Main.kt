@@ -6,9 +6,7 @@ import io.vertx.core.Future
 import io.vertx.core.VertxOptions
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.Vertx
-import io.vertx.rxjava.core.eventbus.EventBus
 import io.vertx.rxjava.core.eventbus.Message
-import io.vertx.rxjava.core.eventbus.MessageConsumer
 import nl.cerios.reactive.chocolate.factory.verticle.Chocolatifier
 import nl.cerios.reactive.chocolate.factory.verticle.HttpEventServer
 import nl.cerios.reactive.chocolate.factory.verticle.LetterStamper
@@ -45,7 +43,7 @@ object Main {
             .put("${Painter::class.java.name}.processingMillis", 1_000L)
             .put("${LetterStamper::class.java.name}.processingMillis", 500L)
             .put("${Packager::class.java.name}.numMnMs", 25)
-            .put("${Packager::class.java.name}.collectAfterMillis", 30_000L)
+            .put("${Packager::class.java.name}.collectAfterMillis", 60_000L)
             .put("${HttpEventServer::class.java.name}.port", 8080)
         )
     CompositeFuture
@@ -99,11 +97,12 @@ fun <T> Observable<T>.delayRandomly(averageDelayMillis: Long): Observable<T> =
           .delay(averageDelayMillis.timesHalfToTwo(), TimeUnit.MILLISECONDS)
     }
 
-fun EventBus.publish(address: String, messageBody: JsonObject, log: Logger) {
-  log.debug("<$address> = $messageBody")
-  publish(address, messageBody)
-}
-
-fun <T> MessageConsumer<T>.toObservable(log: Logger): Observable<Message<T>> =
-    toObservable()
-        .doOnNext { msg -> log.debug("<${msg.address()}> = ${msg.body()}") }
+fun <T> Observable<T>.logIt(log: Logger, label: String = ""): Observable<T> =
+    doOnNext {
+      val prefix = if (label.isNotEmpty()) "$label: " else ""
+      val value = when (it) {
+        is Message<*> -> "[${it.address()}] = ${it.body()}"
+        else -> "$it"
+      }
+      log.debug("$prefix$value")
+    }

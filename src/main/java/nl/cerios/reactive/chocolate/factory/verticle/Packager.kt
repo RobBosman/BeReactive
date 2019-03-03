@@ -2,9 +2,9 @@ package nl.cerios.reactive.chocolate.factory.verticle
 
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
+import nl.cerios.reactive.chocolate.factory.logIt
 import nl.cerios.reactive.chocolate.factory.model.MnM
 import nl.cerios.reactive.chocolate.factory.model.MnMParty
-import nl.cerios.reactive.chocolate.factory.publish
 import org.slf4j.LoggerFactory
 import rx.schedulers.Schedulers
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -20,13 +20,15 @@ class Packager : AbstractVerticle() {
     vertx.eventBus()
         .consumer<JsonObject>("mnm")
         .toObservable()
+        .logIt(log)
         .map { json -> MnM.fromJson(json.body()) }
         .window(collectAfterMillis, collectAfterMillis, MILLISECONDS, numMnMs, Schedulers.computation())
         .flatMap { mnms -> mnms.toList() }
         .filter { mnms -> !mnms.isEmpty() }
         .map { mnm -> MnMParty(mnm).toJson() }
+        .logIt(log, "mnmParty")
         .subscribe(
-            { mnmPartyJson -> vertx.eventBus().publish("mnmParty", mnmPartyJson, log) },
+            { mnmPartyJson -> vertx.eventBus().publish("mnmParty", mnmPartyJson) },
             { throwable -> log.error("Error packaging mnm's.", throwable) })
   }
 }
