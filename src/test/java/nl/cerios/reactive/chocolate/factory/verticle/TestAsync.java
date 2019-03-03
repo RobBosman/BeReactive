@@ -12,5 +12,5 @@ import java.lang.annotation.Target;
 
   int numResultMessages() default 1;
 
-  long maxDurationMillis() default 1_000L;
+  long maxDurationMillis() default 0L;
 }

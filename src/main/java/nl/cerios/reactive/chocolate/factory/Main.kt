@@ -9,7 +9,13 @@ import io.vertx.rxjava.core.Vertx
 import io.vertx.rxjava.core.eventbus.EventBus
 import io.vertx.rxjava.core.eventbus.Message
 import io.vertx.rxjava.core.eventbus.MessageConsumer
-import nl.cerios.reactive.chocolate.factory.verticle.*
+import nl.cerios.reactive.chocolate.factory.verticle.Chocolatifier
+import nl.cerios.reactive.chocolate.factory.verticle.HttpEventServer
+import nl.cerios.reactive.chocolate.factory.verticle.LetterStamper
+import nl.cerios.reactive.chocolate.factory.verticle.Packager
+import nl.cerios.reactive.chocolate.factory.verticle.Painter
+import nl.cerios.reactive.chocolate.factory.verticle.PeanutPaceLogger
+import nl.cerios.reactive.chocolate.factory.verticle.PeanutPooper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import rx.Observable

@@ -4,10 +4,13 @@ import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.ext.unit.TestContext
 import nl.cerios.reactive.chocolate.factory.model.TestHelper
 
-internal object PackagerTest : VerticleTest(Packager::class.java.name, "mnm", "mnmParty") {
+internal object PackagerTest : VerticleTest(
+    Packager::class.java.name,
+    "mnm",
+    "mnmParty") {
 
   private const val defaultNumMnMs = 5
-  private const val collectAfterMillis = 1_000L
+  private const val collectAfterMillis = 100L
 
   override fun configureDeployment(configJson: JsonObject) {
     configJson.put("$verticleName.numMnMs", defaultNumMnMs)

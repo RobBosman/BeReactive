@@ -21,7 +21,7 @@ class PeanutPooper : AbstractVerticle() {
         .consumer<JsonObject>("peanut.pace.set")
         .toObservable()
         .map { json -> json.body().getDouble("value") }
-        .map { pace -> paceToIntervalMillis(pace, minIntervalMillis, maxIntervalMillis) }
+        .map { pace -> paceToIntervalMillis(pace, minIntervalMillis..maxIntervalMillis) }
         .switchMap { averageIntervalMillis -> createPeanutObservable(averageIntervalMillis) }
         .map { peanut -> peanut.toJson() }
         .subscribe(
@@ -29,11 +29,11 @@ class PeanutPooper : AbstractVerticle() {
             { throwable -> log.error("Error producing peanuts.", throwable) })
   }
 
-  private fun paceToIntervalMillis(pace: Double, minIntervalMillis: Long, maxIntervalMillis: Long): Long {
+  private fun paceToIntervalMillis(pace: Double, intervalMillisRange: LongRange): Long {
     return if (pace <= 0.0)
       Long.MAX_VALUE
     else {
-      (minIntervalMillis / pace).toLong().coerceIn(minIntervalMillis, maxIntervalMillis)
+      (intervalMillisRange.first / pace).toLong().coerceIn(intervalMillisRange)
     }
   }
 

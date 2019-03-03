@@ -50,7 +50,7 @@ abstract class VerticleTest(
 
     val testConfig = method.getAnnotation(TestAsync::class.java)
 
-    val abortAfterMillis = testConfig.maxDurationMillis + testConfig.numInputMessages * 10L
+    val abortAfterMillis = testConfig.maxDurationMillis + testConfig.numInputMessages * 100L
     val abortTimerID = vertx.setTimer(abortAfterMillis) {
       testContext.fail("${method.simpleName()} took more than $abortAfterMillis ms")
     }
@@ -78,5 +78,5 @@ abstract class VerticleTest(
     }
   }
 
-  private fun Method.simpleName() = "${javaClass.simpleName}.$name()"
+  private fun Method.simpleName() = "${declaringClass.simpleName}.$name()"
 }
