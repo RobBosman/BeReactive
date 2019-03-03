@@ -6,5 +6,5 @@ internal data class MnMParty(
     private val mnms: List<MnM>) {
 
   fun toJson(): JsonObject = JsonObject()
-      .put("content", mnms.size)
+      .put("numMnMs", mnms.size)
 }

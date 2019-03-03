@@ -17,7 +17,6 @@ function Future() {
   };
 }
 
-
 function CompositeFuture() {
 
   var composite = new Future();
@@ -45,7 +44,6 @@ function CompositeFuture() {
     }
   };
 }
-
 
 var whenDomIsReady = new Future();
 var whenEventBusIsOpen = new Future();

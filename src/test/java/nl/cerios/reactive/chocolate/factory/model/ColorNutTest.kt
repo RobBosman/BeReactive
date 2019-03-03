@@ -1,5 +1,6 @@
 package nl.cerios.reactive.chocolate.factory.model
 
+import nl.cerios.reactive.chocolate.factory.model.TestHelper.createColorNut
 import nl.cerios.reactive.chocolate.factory.verticle.Color
 import nl.cerios.reactive.chocolate.factory.verticle.Flavor
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -13,7 +14,7 @@ internal class ColorNutTest {
     val flavor = Flavor.MILK
     val color = Color.YELLOW
 
-    val colorNut1 = ColorNut(ChocoNut(Peanut(quality), flavor), color)
+    val colorNut1 = createColorNut(quality, flavor, color)
     val json = colorNut1.toJson()
     val colorNut2 = ColorNut.fromJson(json)
 

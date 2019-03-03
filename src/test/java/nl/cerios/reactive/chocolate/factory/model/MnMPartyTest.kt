@@ -1,5 +1,6 @@
 package nl.cerios.reactive.chocolate.factory.model
 
+import nl.cerios.reactive.chocolate.factory.model.TestHelper.createMnM
 import nl.cerios.reactive.chocolate.factory.verticle.Color
 import nl.cerios.reactive.chocolate.factory.verticle.Flavor
 import org.junit.jupiter.api.Assertions
@@ -17,9 +18,7 @@ internal class MnMPartyTest {
     val mnmParty1 = MnMParty(mnms)
     val json = mnmParty1.toJson()
 
-    Assertions.assertEquals(mnms.size, json.getInteger("content"))
-    Assertions.assertEquals("""{"content":5}""", json.encode())
+    Assertions.assertEquals(mnms.size, json.getInteger("numMnMs"))
+    Assertions.assertEquals("""{"numMnMs":5}""", json.encode())
   }
-
-  private fun createMnM(quality: Double, flavor: Flavor, color: Color): MnM = MnM(ColorNut(ChocoNut(Peanut(quality), flavor), color))
 }

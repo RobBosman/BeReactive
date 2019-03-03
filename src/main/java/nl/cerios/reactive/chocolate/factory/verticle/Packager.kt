@@ -12,15 +12,16 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 class Packager : AbstractVerticle() {
 
   private val log = LoggerFactory.getLogger(javaClass)
-  private val weight = 25
-  private val timeoutMillis = 30_000L
 
   override fun start() {
+    val numMnMs = config().getInteger("${javaClass.name}.numMnMs")
+    val collectAfterMillis = config().getLong("${javaClass.name}.collectAfterMillis")
+
     vertx.eventBus()
         .consumer<JsonObject>("mnm")
         .toObservable()
         .map { json -> MnM.fromJson(json.body()) }
-        .window(timeoutMillis, timeoutMillis, MILLISECONDS, weight, Schedulers.computation())
+        .window(collectAfterMillis, collectAfterMillis, MILLISECONDS, numMnMs, Schedulers.computation())
         .flatMap { mnms -> mnms.toList() }
         .filter { mnms -> !mnms.isEmpty() }
         .map { mnm -> MnMParty(mnm).toJson() }

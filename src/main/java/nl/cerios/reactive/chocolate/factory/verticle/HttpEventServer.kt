@@ -12,10 +12,9 @@ import org.slf4j.LoggerFactory
 class HttpEventServer : AbstractVerticle() {
 
   private val log = LoggerFactory.getLogger(javaClass)
-  private val serverPort = 8080
 
   override fun start(futureResult: Future<Void>) {
-
+    val port = config().getInteger("${javaClass.name}.port")
     val router = Router.router(vertx)
 
     router.route()
@@ -28,12 +27,11 @@ class HttpEventServer : AbstractVerticle() {
                 .addInboundPermitted(PermittedOptions().setAddress("peanut.pace.set"))
                 .addOutboundPermitted(PermittedOptions().setAddress("peanut"))
                 .addOutboundPermitted(PermittedOptions().setAddress("peanut.pace.set"))))
-
     vertx.createHttpServer()
         .requestHandler(router)
-        .listen(serverPort) { result ->
+        .listen(port) { result ->
           if (result.succeeded()) {
-            log.info("Server is listening on http://localhost:$serverPort/")
+            log.info("Server is listening on http://localhost:$port/")
             futureResult.complete()
           } else {
             futureResult.fail(result.cause())

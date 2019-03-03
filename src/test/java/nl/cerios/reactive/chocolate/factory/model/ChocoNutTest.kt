@@ -1,5 +1,6 @@
 package nl.cerios.reactive.chocolate.factory.model
 
+import nl.cerios.reactive.chocolate.factory.model.TestHelper.createChocoNut
 import nl.cerios.reactive.chocolate.factory.verticle.Flavor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -11,7 +12,7 @@ internal class ChocoNutTest {
     val quality = 0.25
     val flavor = Flavor.MILK
 
-    val chocoNut1 = ChocoNut(Peanut(quality), flavor)
+    val chocoNut1 = createChocoNut(quality, flavor)
     val json = chocoNut1.toJson()
     val chocoNut2 = ChocoNut.fromJson(json)
 

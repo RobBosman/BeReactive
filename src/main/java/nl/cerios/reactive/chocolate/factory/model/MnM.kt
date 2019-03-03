@@ -6,7 +6,7 @@ internal data class MnM(
     private val colorNut: ColorNut) {
 
   companion object {
-    fun fromJson(json: JsonObject): MnM =  MnM(ColorNut.fromJson(json))
+    fun fromJson(json: JsonObject): MnM = MnM(ColorNut.fromJson(json))
   }
 
   fun toJson(): JsonObject = colorNut.toJson()
