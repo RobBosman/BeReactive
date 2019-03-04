@@ -17,7 +17,7 @@ class LetterStamper : AbstractVerticle() {
     vertx.eventBus()
         .consumer<JsonObject>("colorNut")
         .toObservable()
-        .map { json -> ColorNut.fromJson(json.body()) }
+        .map { message -> ColorNut.fromJson(message.body()) }
         .delayRandomly(processingMillis)
         .map { colorNut -> MnM(colorNut).toJson() }
         .subscribe(

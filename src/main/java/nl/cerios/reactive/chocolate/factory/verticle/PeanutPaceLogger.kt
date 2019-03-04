@@ -14,7 +14,7 @@ class PeanutPaceLogger : AbstractVerticle() {
         .consumer<JsonObject>("peanut.pace.set")
         .toObservable()
         .debounce(200, MILLISECONDS)
-        .map { json -> Math.floor(json.body().getDouble("value") * 100.0) }
+        .map { message -> Math.floor(message.body().getDouble("value") * 100.0) }
         .subscribe { percentage -> log.debug("Peanut production pace: $percentage%") }
   }
 }

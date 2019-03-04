@@ -10,6 +10,6 @@ table {
   border-style: solid;
 }
 .value {
-  font-family: 'Cousine';
+  font-family: 'Cousine', sans-serif;
   text-align: right;
 }

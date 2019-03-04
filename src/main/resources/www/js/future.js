@@ -1,5 +1,8 @@
 "use strict";
 
+var whenDomIsReady = new Future();
+window.onload = whenDomIsReady.completed;
+
 function Future() {
 
   var callbackFunctions = [];
@@ -44,6 +47,3 @@ function CompositeFuture() {
     }
   };
 }
-
-var whenDomIsReady = new Future();
-window.onload = whenDomIsReady.completed;

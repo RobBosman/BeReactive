@@ -20,7 +20,7 @@ class PeanutPooper : AbstractVerticle() {
     vertx.eventBus()
         .consumer<JsonObject>("peanut.pace.set")
         .toObservable()
-        .map { json -> json.body().getDouble("value") }
+        .map { message -> message.body().getDouble("value") }
         .map { pace -> paceToIntervalMillis(pace, minIntervalMillis..maxIntervalMillis) }
         .switchMap { averageIntervalMillis -> createPeanutObservable(averageIntervalMillis) }
         .map { peanut -> peanut.toJson() }

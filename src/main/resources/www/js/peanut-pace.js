@@ -1,12 +1,14 @@
 "use strict";
 
-var whenSliderIsReady = new Future();
+var peanutPace = new PeanutPace();
 
 function PeanutPace() {
 
-  var ID = Math.random().toFixed(10);
+  var sliderID = Math.random().toFixed(10);
   var peanutPaceSlider;
   var isSuppressingUpdates = true;
+  var whenSliderIsReady = new Future();
+  var self = this;
 
   this.initializeSlider = function() {
     peanutPaceSlider = document.getElementById('peanut-pace');
@@ -22,7 +24,7 @@ function PeanutPace() {
       if (!isSuppressingUpdates) {
         eventBus.publish('peanut.pace.set',
           { 'value': values[handle] / 100.0 },
-          { 'id': ID });
+          { 'sliderID': sliderID });
       }
     });
 
@@ -31,17 +33,26 @@ function PeanutPace() {
   };
 
   this.updatePeanutPace = function(err, msg) {
-  if (msg === false) {
-    return;
-  }
+    if (msg === false) {
+      return;
+    }
     var intensityPercentage = 100.0 * msg.body.value;
     document.getElementById('peanut-pace-percentage').innerHTML = intensityPercentage.toFixed(0) + "%";
-    if (msg.headers == null || msg.headers.id != ID) {
+    if (msg.headers == null || msg.headers.sliderID != sliderID) {
       isSuppressingUpdates = true;
       peanutPaceSlider.noUiSlider.set(intensityPercentage);
       isSuppressingUpdates = false;
     }
   };
 
-  whenDomIsReady.thenDo(this.initializeSlider);
+  whenDomIsReady
+    .thenDo(self.initializeSlider);
+
+  new CompositeFuture()
+      .and(whenSliderIsReady)
+      .and(whenEventBusIsOpen)
+      .thenDo(function() {
+        eventBus.registerHandler('peanut.pace.set', '', self.updatePeanutPace);
+        eventBus.send('peanut.pace.get', '', self.updatePeanutPace);
+      });
 }

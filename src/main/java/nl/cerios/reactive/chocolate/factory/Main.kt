@@ -13,6 +13,7 @@ import nl.cerios.reactive.chocolate.factory.verticle.LetterStamper
 import nl.cerios.reactive.chocolate.factory.verticle.Packager
 import nl.cerios.reactive.chocolate.factory.verticle.Painter
 import nl.cerios.reactive.chocolate.factory.verticle.PeanutPaceLogger
+import nl.cerios.reactive.chocolate.factory.verticle.PeanutPaceMonitor
 import nl.cerios.reactive.chocolate.factory.verticle.PeanutPooper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -56,6 +57,7 @@ object Main {
                 deployVerticle(vertx, deploymentOptions, Packager::class.java.name)
             ),
             CompositeFuture.all(
+                deployVerticle(vertx, deploymentOptions, PeanutPaceMonitor::class.java.name),
                 deployVerticle(vertx, deploymentOptions, PeanutPaceLogger::class.java.name),
                 deployVerticle(vertx, deploymentOptions, HttpEventServer::class.java.name)
             )
@@ -88,6 +90,8 @@ object Main {
     return result
   }
 }
+
+fun <T : Enum<T>> chooseEnum(enumValues: Array<T>) = enumValues[SecureRandom().nextInt(enumValues.size)]
 
 fun Long.timesHalfToTwo() = Math.round(this * (0.5 + 1.5 * SecureRandom().nextDouble()))
 

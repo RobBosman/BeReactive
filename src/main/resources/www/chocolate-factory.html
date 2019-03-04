@@ -5,14 +5,9 @@
   <link href='https://fonts.googleapis.com/css?family=Raleway:500' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Cousine' rel='stylesheet' type='text/css'>
   <link href="/css/nouislider.min.css" rel="stylesheet" type="text/css">
-  <script src="//cdn.jsdelivr.net/sockjs/1.0.3/sockjs.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/vertx/3.6.3/vertx-eventbus.min.js"></script>
-  <script src="/js/nouislider.min.js"></script>
-
   <link href="/css/peanut-pace.css" rel="stylesheet" type="text/css">
   <link href="/css/chocolate-factory.css" rel="stylesheet" type="text/css">
 </head>
-
 
 <style type='text/css'>
 .peanut {
@@ -28,18 +23,6 @@
 @keyframes peanutOnBelt {
     0% {top:  60px;}
   100% {top: 800px; transform: rotate(4turn);}
-}
-.beingConsumed {
-  width: 36px;
-  height: 17px;
-  position: relative;
-  background-image: url("/img/peanut.png");
-  background-size: cover;
-  animation: peanutBeingConsumed 1s linear forwards;
-}
-@keyframes peanutBeingConsumed {
-  0%   {left:  0px;}
-  100% {left: 80px;}
 }
 
 .progress {
@@ -74,56 +57,6 @@
 }
 </style>
 
-<script language="javascript">
-function produceItem(conveyorBeltID, className) {
-  var conveyorBelt = document.getElementById(conveyorBeltID);
-  var item = document.createElement('div');
-  item.className = className;
-  conveyorBelt.appendChild(item);
-  setTimeout(
-	  function(){
-	    if (item.className === className) {
-	      consumeItem(item, 2000);
-	    }
-	  },
-    1000);
-  setTimeout(function(){
-      if (item.className === className) {
-        conveyorBelt.removeChild(item);
-      }
-    },
-    5000);
-  return item;
-}
-
-function consumeItem(item, duration) {
-  var workers = document.querySelectorAll('.worker');
-  for (w = 0; w < workers.length; w++) {
-    var worker = workers[w];
-    var progressNodes = worker.querySelectorAll('.progress');
-    for (p = progressNodes.length - 1; p >= 0; p--) {
-	    var progressNode = progressNodes[p];
-      if (progressNode.children.length == 0) {
-        worker.appendChild(item.parentElement.removeChild(item));
-        item.style.transform = "rotate(0)";
-        item.className = 'beingConsumed';
-        setTimeout(function(){
-          item.parentElement.removeChild(item);
-          item.className = 'progressBar';
-          item.style.animationDuration = duration + "ms";
-          progressNode.appendChild(item);
-          setTimeout(function(){
-            progressNode.removeChild(item);
-          }, duration);
-        }, 800);
-        return true;
-      }
-    }
-  }
-  return false;
-}
-</script>
-
 <body>
 <h1>Reactive Chocolate Factory</h1>
 
@@ -149,7 +82,11 @@ function consumeItem(item, duration) {
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/sockjs/1.0.3/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vertx/3.6.3/vertx-eventbus.min.js"></script>
+<script src="/js/nouislider.min.js"></script>
 <script src="/js/future.js"></script>
+<script src="/js/eventbus.js"></script>
 <script src="/js/peanut-pace.js"></script>
 <script src="/js/chocolate-factory.js"></script>
 

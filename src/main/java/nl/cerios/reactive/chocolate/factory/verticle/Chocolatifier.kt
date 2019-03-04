@@ -2,11 +2,11 @@ package nl.cerios.reactive.chocolate.factory.verticle
 
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
+import nl.cerios.reactive.chocolate.factory.chooseEnum
 import nl.cerios.reactive.chocolate.factory.delayRandomly
 import nl.cerios.reactive.chocolate.factory.model.ChocoNut
 import nl.cerios.reactive.chocolate.factory.model.Peanut
 import org.slf4j.LoggerFactory
-import java.security.SecureRandom
 
 enum class Flavor { PURE, MILK, WHITE }
 
@@ -20,13 +20,11 @@ class Chocolatifier : AbstractVerticle() {
     vertx.eventBus()
         .consumer<JsonObject>("peanut")
         .toObservable()
-        .map { json -> Peanut.fromJson(json.body()) }
+        .map { message -> Peanut.fromJson(message.body()) }
         .delayRandomly(processingMillis)
-        .map { peanut -> ChocoNut(peanut, chooseFlavor()).toJson() }
+        .map { peanut -> ChocoNut(peanut, chooseEnum(Flavor.values())).toJson() }
         .subscribe(
             { chocoNutJson -> vertx.eventBus().publish("chocoNut", chocoNutJson) },
             { throwable -> log.error("Error making chocolate of peanuts.", throwable) })
   }
-
-  private fun chooseFlavor() = Flavor.values()[SecureRandom().nextInt(Flavor.values().size)]
 }
