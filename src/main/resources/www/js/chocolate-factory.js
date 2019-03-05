@@ -21,5 +21,7 @@ function producedPeanut(peanutID, conveyorBeltID) {
 
 function consumedPeanut(peanutID) {
   var peanut = document.getElementById(peanutID);
-  peanut.parentElement.removeChild(peanut);
+  if (peanut != null) {
+    peanut.parentElement.removeChild(peanut);
+  }
 }
