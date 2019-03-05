@@ -15,13 +15,14 @@ class LetterStamper : AbstractVerticle() {
     val processingMillis = config().getLong("${javaClass.name}.processingMillis")
 
     vertx.eventBus()
-        .consumer<JsonObject>("colorNut")
+        .consumer<JsonObject>("colorNut.produced")
         .toObservable()
         .map { message -> ColorNut.fromJson(message.body()) }
+        .doOnNext { colorNut -> vertx.eventBus().publish("colorNut.consumed", JsonObject().put("id", colorNut.id.toString())) }
         .delayRandomly(processingMillis)
         .map { colorNut -> MnM(colorNut).toJson() }
         .subscribe(
-            { mnmJson -> vertx.eventBus().publish("mnm", mnmJson) },
+            { mnmJson -> vertx.eventBus().publish("mnm.produced", mnmJson) },
             { throwable -> log.error("Error stamping colorNuts.", throwable) })
   }
 }

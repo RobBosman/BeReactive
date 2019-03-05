@@ -15,6 +15,8 @@ class PeanutPaceLogger : AbstractVerticle() {
         .toObservable()
         .debounce(200, MILLISECONDS)
         .map { message -> Math.floor(message.body().getDouble("value") * 100.0) }
-        .subscribe { percentage -> log.debug("Peanut production pace: $percentage%") }
+        .subscribe(
+            { percentage -> log.debug("Peanut production pace: $percentage%") },
+            { t -> log.error("Error logging peanut pace", t) })
   }
 }

@@ -6,8 +6,8 @@ import nl.cerios.reactive.chocolate.factory.model.TestHelper
 
 internal object LetterStamperTest : VerticleTest(
     LetterStamper::class.java.name,
-    "colorNut",
-    "mnm") {
+    "colorNut.produced",
+    "mnm.produced") {
 
   private const val processingMillis = 100L
 

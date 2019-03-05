@@ -2,14 +2,17 @@ package nl.cerios.reactive.chocolate.factory.model
 
 import io.vertx.core.json.JsonObject
 import nl.cerios.reactive.chocolate.factory.verticle.Flavor
+import java.util.*
 
-internal data class ChocoNut(
+data class ChocoNut(
     private val peanut: Peanut,
-    private val flavor: Flavor) {
+    val flavor: Flavor) {
+
+  val id: UUID
+    get() = peanut.id
 
   companion object {
-    fun fromJson(json: JsonObject): ChocoNut =
-        ChocoNut(Peanut.fromJson(json), Flavor.valueOf(json.getString("flavor")))
+    fun fromJson(json: JsonObject): ChocoNut = ChocoNut(Peanut.fromJson(json), Flavor.valueOf(json.getString("flavor")))
   }
 
   fun toJson(): JsonObject = peanut.toJson()

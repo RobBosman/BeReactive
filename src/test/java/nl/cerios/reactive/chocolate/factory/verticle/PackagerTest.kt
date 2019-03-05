@@ -6,8 +6,8 @@ import nl.cerios.reactive.chocolate.factory.model.TestHelper
 
 internal object PackagerTest : VerticleTest(
     Packager::class.java.name,
-    "mnm",
-    "mnmParty") {
+    "mnm.produced",
+    "mnmParty.produced") {
 
   private const val defaultNumMnMs = 5
   private const val collectAfterMillis = 100L

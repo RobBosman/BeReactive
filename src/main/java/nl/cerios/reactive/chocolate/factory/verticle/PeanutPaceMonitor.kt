@@ -23,6 +23,7 @@ class PeanutPaceMonitor : AbstractVerticle() {
         }
         .subscribe(
             {},
-            { t -> log.error("Error monitoring peanut pace.", t) })
+            { t -> log.error("Error monitoring peanut pace.", t) }
+        )
   }
 }

@@ -2,10 +2,14 @@ package nl.cerios.reactive.chocolate.factory.model
 
 import io.vertx.core.json.JsonObject
 import nl.cerios.reactive.chocolate.factory.verticle.Color
+import java.util.*
 
-internal data class ColorNut(
+data class ColorNut(
     private val chocoNut: ChocoNut,
-    private val color: Color) {
+    val color: Color) {
+
+  val id: UUID
+    get() = chocoNut.id
 
   companion object {
     fun fromJson(json: JsonObject): ColorNut =

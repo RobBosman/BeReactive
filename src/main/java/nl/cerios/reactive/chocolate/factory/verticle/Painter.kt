@@ -2,10 +2,10 @@ package nl.cerios.reactive.chocolate.factory.verticle
 
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
-import nl.cerios.reactive.chocolate.factory.chooseEnum
 import nl.cerios.reactive.chocolate.factory.delayRandomly
 import nl.cerios.reactive.chocolate.factory.model.ChocoNut
 import nl.cerios.reactive.chocolate.factory.model.ColorNut
+import nl.cerios.reactive.chocolate.factory.pickEnum
 import org.slf4j.LoggerFactory
 
 enum class Color { GREEN, YELLOW, BLUE, RED, ORANGE }
@@ -18,13 +18,14 @@ class Painter : AbstractVerticle() {
     val processingMillis = config().getLong("${javaClass.name}.processingMillis")
 
     vertx.eventBus()
-        .consumer<JsonObject>("chocoNut")
+        .consumer<JsonObject>("chocoNut.produced")
         .toObservable()
         .map { message -> ChocoNut.fromJson(message.body()) }
+        .doOnNext { chocoNut -> vertx.eventBus().publish("chocoNut.consumed", JsonObject().put("id", chocoNut.id.toString())) }
         .delayRandomly(processingMillis)
-        .map { chocoNut -> ColorNut(chocoNut, chooseEnum(Color.values())).toJson() }
+        .map { chocoNut -> ColorNut(chocoNut, pickEnum(Color.values())).toJson() }
         .subscribe(
-            { chocoNutJson -> vertx.eventBus().publish("colorNut", chocoNutJson) },
+            { chocoNutJson -> vertx.eventBus().publish("colorNut.produced", chocoNutJson) },
             { throwable -> log.error("Error painting chocoNuts.", throwable) })
   }
 }

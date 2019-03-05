@@ -6,8 +6,8 @@ import nl.cerios.reactive.chocolate.factory.model.TestHelper
 
 internal object PainterTest : VerticleTest(
     Painter::class.java.name,
-    "chocoNut",
-    "colorNut") {
+    "chocoNut.produced",
+    "colorNut.produced") {
 
   private const val processingMillis = 100L
 

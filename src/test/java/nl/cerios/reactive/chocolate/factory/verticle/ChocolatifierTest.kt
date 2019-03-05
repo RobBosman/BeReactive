@@ -3,11 +3,12 @@ package nl.cerios.reactive.chocolate.factory.verticle
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.ext.unit.TestContext
 import nl.cerios.reactive.chocolate.factory.model.Peanut
+import java.util.UUID.randomUUID
 
 internal object ChocolatifierTest : VerticleTest(
     Chocolatifier::class.java.name,
-    "peanut",
-    "chocoNut") {
+    "peanut.produced",
+    "chocoNut.produced") {
 
   private const val processingMillis = 100L
 
@@ -15,7 +16,7 @@ internal object ChocolatifierTest : VerticleTest(
     configJson.put("$verticleName.processingMillis", processingMillis)
   }
 
-  override fun composeInputMessage(): JsonObject = Peanut(0.5).toJson()
+  override fun composeInputMessage(): JsonObject = Peanut(randomUUID(), 0.5).toJson()
 
   @TestAsync(
       numInputMessages = 10,

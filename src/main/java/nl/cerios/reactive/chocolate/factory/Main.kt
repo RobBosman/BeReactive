@@ -18,8 +18,8 @@ import nl.cerios.reactive.chocolate.factory.verticle.PeanutPooper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import rx.Observable
-import java.security.SecureRandom
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
+import kotlin.random.Random
 
 fun main() = Main.run()
 
@@ -91,14 +91,14 @@ object Main {
   }
 }
 
-fun <T : Enum<T>> chooseEnum(enumValues: Array<T>) = enumValues[SecureRandom().nextInt(enumValues.size)]
+fun <T : Enum<T>> pickEnum(enumValues: Array<T>) = enumValues[Random.nextInt(enumValues.size)]
 
-fun Long.timesHalfToTwo() = Math.round(this * (0.5 + 1.5 * SecureRandom().nextDouble()))
+fun Long.timesHalfToTwo() = Math.round(this * (0.5 + 1.5 * Random.nextDouble()))
 
 fun <T> Observable<T>.delayRandomly(averageDelayMillis: Long): Observable<T> =
     delay { item ->
       Observable.create<T> { emitter -> emitter.onNext(item) }
-          .delay(averageDelayMillis.timesHalfToTwo(), TimeUnit.MILLISECONDS)
+          .delay(averageDelayMillis.timesHalfToTwo(), MILLISECONDS)
     }
 
 fun <T> Observable<T>.logIt(log: Logger, label: String = ""): Observable<T> =

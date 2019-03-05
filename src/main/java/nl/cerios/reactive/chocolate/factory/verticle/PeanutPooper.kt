@@ -2,12 +2,14 @@ package nl.cerios.reactive.chocolate.factory.verticle
 
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
+import nl.cerios.reactive.chocolate.factory.logIt
 import nl.cerios.reactive.chocolate.factory.model.Peanut
 import nl.cerios.reactive.chocolate.factory.timesHalfToTwo
 import org.slf4j.LoggerFactory
 import rx.Observable
 import rx.Subscriber
-import java.security.SecureRandom
+import java.util.UUID.randomUUID
+import kotlin.random.Random
 
 class PeanutPooper : AbstractVerticle() {
 
@@ -24,8 +26,9 @@ class PeanutPooper : AbstractVerticle() {
         .map { pace -> paceToIntervalMillis(pace, minIntervalMillis..maxIntervalMillis) }
         .switchMap { averageIntervalMillis -> createPeanutObservable(averageIntervalMillis) }
         .map { peanut -> peanut.toJson() }
+        .logIt(log, "consumed")
         .subscribe(
-            { peanutJson -> vertx.eventBus().publish("peanut", peanutJson) },
+            { peanutJson -> vertx.eventBus().publish("peanut.produced", peanutJson) },
             { throwable -> log.error("Error producing peanuts.", throwable) })
   }
 
@@ -43,11 +46,11 @@ class PeanutPooper : AbstractVerticle() {
   private fun createDelayedPeanut(averageIntervalMillis: Long, subscriber: Subscriber<in Peanut>) {
     vertx.setTimer(averageIntervalMillis.timesHalfToTwo()) {
       if (!subscriber.isUnsubscribed) {
-        subscriber.onNext(Peanut(chooseQuality()))
+        subscriber.onNext(createPeanut())
         createDelayedPeanut(averageIntervalMillis, subscriber)
       }
     }
   }
 
-  private fun chooseQuality() = SecureRandom().nextInt(1_000) / 1_000.0
+  private fun createPeanut() = Peanut(randomUUID(), Random.nextInt(1_000) / 1_000.0)
 }

@@ -5,14 +5,15 @@ import nl.cerios.reactive.chocolate.factory.verticle.Color
 import nl.cerios.reactive.chocolate.factory.verticle.Flavor
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import java.util.UUID.randomUUID
 
 internal class MnMPartyTest {
 
   @Test
   fun json() {
-    val mnm1 = createMnM(0.25, Flavor.MILK, Color.YELLOW)
-    val mnm2 = createMnM(0.35, Flavor.PURE, Color.GREEN)
-    val mnm3 = createMnM(0.45, Flavor.WHITE, Color.RED)
+    val mnm1 = createMnM(randomUUID(), 0.25, Flavor.MILK, Color.YELLOW)
+    val mnm2 = createMnM(randomUUID(), 0.35, Flavor.PURE, Color.GREEN)
+    val mnm3 = createMnM(randomUUID(), 0.45, Flavor.WHITE, Color.RED)
     val mnms = listOf(mnm1, mnm2, mnm3, mnm1, mnm2)
 
     val mnmParty1 = MnMParty(mnms)

@@ -6,7 +6,7 @@ import io.vertx.rxjava.ext.unit.TestContext
 internal object PeanutPooperTest : VerticleTest(
     PeanutPooper::class.java.name,
     "peanut.pace.set",
-    "peanut") {
+    "peanut.produced") {
 
   private const val maxIntervalMillis = 100L
 

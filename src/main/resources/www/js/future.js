@@ -36,7 +36,7 @@ function CompositeFuture() {
   this.futureCallback = function(completedFuture) {
     var allCompleted = true;
     for (var i = 0; i < futures.length; i++) {
-      if (futures[i] == completedFuture) {
+      if (futures[i] === completedFuture) {
         futures[i] = null;
       } else if (futures[i] != null) {
         allCompleted = false;

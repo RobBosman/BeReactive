@@ -18,16 +18,17 @@ class Packager : AbstractVerticle() {
     val collectAfterMillis = config().getLong("${javaClass.name}.collectAfterMillis")
 
     vertx.eventBus()
-        .consumer<JsonObject>("mnm")
+        .consumer<JsonObject>("mnm.produced")
         .toObservable()
         .map { message -> MnM.fromJson(message.body()) }
+        .doOnNext { mnm -> vertx.eventBus().publish("mnm.consumed", JsonObject().put("id", mnm.id.toString())) }
         .window(collectAfterMillis, collectAfterMillis, MILLISECONDS, numMnMs, Schedulers.computation())
         .flatMap { mnmObservable -> mnmObservable.toList() }
         .filter { mnmList -> !mnmList.isEmpty() }
         .map { mnm -> MnMParty(mnm).toJson() }
         .logIt(log, "mnmParty")
         .subscribe(
-            { mnmPartyJson -> vertx.eventBus().publish("mnmParty", mnmPartyJson) },
+            { mnmPartyJson -> vertx.eventBus().publish("mnmParty.produced", mnmPartyJson) },
             { throwable -> log.error("Error packaging mnm's.", throwable) })
   }
 }
