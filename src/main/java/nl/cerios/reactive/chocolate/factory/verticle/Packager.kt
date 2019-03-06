@@ -2,6 +2,7 @@ package nl.cerios.reactive.chocolate.factory.verticle
 
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
+import nl.cerios.reactive.chocolate.factory.delayAndNotifyConsumption
 import nl.cerios.reactive.chocolate.factory.logIt
 import nl.cerios.reactive.chocolate.factory.model.MnM
 import nl.cerios.reactive.chocolate.factory.model.MnMParty
@@ -20,8 +21,8 @@ class Packager : AbstractVerticle() {
     vertx.eventBus()
         .consumer<JsonObject>("mnm.produced")
         .toObservable()
+        .delayAndNotifyConsumption(vertx)
         .map { message -> MnM.fromJson(message.body()) }
-        .doOnNext { mnm -> vertx.eventBus().publish("mnm.consumed", JsonObject().put("id", mnm.id.toString())) }
         .window(collectAfterMillis, collectAfterMillis, MILLISECONDS, numMnMs, Schedulers.computation())
         .flatMap { mnmObservable -> mnmObservable.toList() }
         .filter { mnmList -> !mnmList.isEmpty() }

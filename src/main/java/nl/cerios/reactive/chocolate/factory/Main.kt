@@ -101,7 +101,12 @@ fun <T> Observable<T>.delayRandomly(averageDelayMillis: Long): Observable<T> =
           .delay(averageDelayMillis.timesHalfToTwo(), MILLISECONDS)
     }
 
-fun <T> Observable<T>.logIt(log: Logger, label: String = ""): Observable<T> =
+fun <T : Message<JsonObject>> Observable<T>.delayAndNotifyConsumption(vertx: Vertx): Observable<T> =
+    throttleFirst(2_000, MILLISECONDS)
+        .delay(2_000, MILLISECONDS)
+        .doOnNext { message -> vertx.eventBus().publish(message.address().replace("produced", "consumed"), message.body()) }
+
+fun <T> Observable<T>.logIt(log: Logger, label: String = ""): Observable<out T> =
     doOnNext {
       val prefix = if (label.isNotEmpty()) "$label: " else ""
       val value = when (it) {

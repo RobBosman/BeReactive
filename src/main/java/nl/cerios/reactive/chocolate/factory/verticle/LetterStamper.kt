@@ -2,6 +2,7 @@ package nl.cerios.reactive.chocolate.factory.verticle
 
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
+import nl.cerios.reactive.chocolate.factory.delayAndNotifyConsumption
 import nl.cerios.reactive.chocolate.factory.delayRandomly
 import nl.cerios.reactive.chocolate.factory.model.ColorNut
 import nl.cerios.reactive.chocolate.factory.model.MnM
@@ -17,8 +18,8 @@ class LetterStamper : AbstractVerticle() {
     vertx.eventBus()
         .consumer<JsonObject>("colorNut.produced")
         .toObservable()
+        .delayAndNotifyConsumption(vertx)
         .map { message -> ColorNut.fromJson(message.body()) }
-        .doOnNext { colorNut -> vertx.eventBus().publish("colorNut.consumed", JsonObject().put("id", colorNut.id.toString())) }
         .delayRandomly(processingMillis)
         .map { colorNut -> MnM(colorNut).toJson() }
         .subscribe(

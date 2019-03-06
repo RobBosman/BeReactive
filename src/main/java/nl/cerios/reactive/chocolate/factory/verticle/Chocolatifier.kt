@@ -2,12 +2,13 @@ package nl.cerios.reactive.chocolate.factory.verticle
 
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
+import nl.cerios.reactive.chocolate.factory.delayAndNotifyConsumption
 import nl.cerios.reactive.chocolate.factory.delayRandomly
+import nl.cerios.reactive.chocolate.factory.logIt
 import nl.cerios.reactive.chocolate.factory.model.ChocoNut
 import nl.cerios.reactive.chocolate.factory.model.Peanut
 import nl.cerios.reactive.chocolate.factory.pickEnum
 import org.slf4j.LoggerFactory
-import java.util.concurrent.TimeUnit.MILLISECONDS
 
 enum class Flavor { PURE, MILK, WHITE }
 
@@ -21,9 +22,9 @@ class Chocolatifier : AbstractVerticle() {
     vertx.eventBus()
         .consumer<JsonObject>("peanut.produced")
         .toObservable()
+        .delayAndNotifyConsumption(vertx)
+        .logIt(log, "consuming")
         .map { message -> Peanut.fromJson(message.body()) }
-        .delay(2_000, MILLISECONDS)
-        .doOnNext { peanut -> vertx.eventBus().publish("peanut.consumed", JsonObject().put("id", peanut.id.toString())) }
         .delayRandomly(processingMillis)
         .map { peanut -> ChocoNut(peanut, pickEnum(Flavor.values())).toJson() }
         .subscribe(

@@ -26,7 +26,7 @@ class PeanutPooper : AbstractVerticle() {
         .map { pace -> paceToIntervalMillis(pace, minIntervalMillis..maxIntervalMillis) }
         .switchMap { averageIntervalMillis -> createPeanutObservable(averageIntervalMillis) }
         .map { peanut -> peanut.toJson() }
-        .logIt(log, "consumed")
+        .logIt(log, "pooped")
         .subscribe(
             { peanutJson -> vertx.eventBus().publish("peanut.produced", peanutJson) },
             { throwable -> log.error("Error producing peanuts.", throwable) })
