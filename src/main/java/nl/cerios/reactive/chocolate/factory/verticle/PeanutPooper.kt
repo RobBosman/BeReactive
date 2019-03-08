@@ -2,7 +2,6 @@ package nl.cerios.reactive.chocolate.factory.verticle
 
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
-import nl.cerios.reactive.chocolate.factory.logIt
 import nl.cerios.reactive.chocolate.factory.model.Peanut
 import nl.cerios.reactive.chocolate.factory.timesHalfToTwo
 import org.slf4j.LoggerFactory
@@ -26,7 +25,6 @@ class PeanutPooper : AbstractVerticle() {
         .map { pace -> paceToIntervalMillis(pace, minIntervalMillis..maxIntervalMillis) }
         .switchMap { averageIntervalMillis -> createPeanutObservable(averageIntervalMillis) }
         .map { peanut -> peanut.toJson() }
-        .logIt(log, "pooped")
         .subscribe(
             { peanutJson -> vertx.eventBus().publish("peanut.produced", peanutJson) },
             { throwable -> log.error("Error producing peanuts.", throwable) })

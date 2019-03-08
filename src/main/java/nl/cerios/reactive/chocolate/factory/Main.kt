@@ -25,7 +25,7 @@ fun main() = Main.run()
 
 object Main {
 
-  private val log = LoggerFactory.getLogger(javaClass)
+  internal val log = LoggerFactory.getLogger(javaClass)
   private const val abortAfterMillis = 120_000L // 2 minutes
 
   fun run() {
@@ -95,16 +95,20 @@ fun <T : Enum<T>> pickEnum(enumValues: Array<T>) = enumValues[Random.nextInt(enu
 
 fun Long.timesHalfToTwo() = Math.round(this * (0.5 + 1.5 * Random.nextDouble()))
 
-fun <T> Observable<T>.delayRandomly(averageDelayMillis: Long): Observable<T> =
-    delay { item ->
-      Observable.create<T> { emitter -> emitter.onNext(item) }
-          .delay(averageDelayMillis.timesHalfToTwo(), MILLISECONDS)
-    }
-
-fun <T : Message<JsonObject>> Observable<T>.delayAndNotifyConsumption(vertx: Vertx): Observable<T> =
-    throttleFirst(2_000, MILLISECONDS)
-        .delay(2_000, MILLISECONDS)
+fun <T : Message<JsonObject>> Observable<T>.delayAndNotifyConsumption(vertx: Vertx, anticipateMillis: Long, averageProcessingMillis: Long = 0): Observable<out T> =
+    delay(anticipateMillis, MILLISECONDS)
+        .throttleFirst(averageProcessingMillis, MILLISECONDS)
         .doOnNext { message -> vertx.eventBus().publish(message.address().replace("produced", "consumed"), message.body()) }
+        .delay(1_000L, MILLISECONDS) // ramp-up
+        .delay { item ->
+          val delayObservable = Observable.create<T> { emitter -> emitter.onNext(item) }
+          if (averageProcessingMillis > 0) {
+            delayObservable.delay(averageProcessingMillis.timesHalfToTwo(), MILLISECONDS)
+          } else {
+            delayObservable
+          }
+        }
+        .delay(1_000L, MILLISECONDS) // ramp-down
 
 fun <T> Observable<T>.logIt(log: Logger, label: String = ""): Observable<out T> =
     doOnNext {

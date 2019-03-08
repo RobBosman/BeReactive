@@ -21,7 +21,7 @@ class Packager : AbstractVerticle() {
     vertx.eventBus()
         .consumer<JsonObject>("mnm.produced")
         .toObservable()
-        .delayAndNotifyConsumption(vertx)
+        .delayAndNotifyConsumption(vertx, 2_000)
         .map { message -> MnM.fromJson(message.body()) }
         .window(collectAfterMillis, collectAfterMillis, MILLISECONDS, numMnMs, Schedulers.computation())
         .flatMap { mnmObservable -> mnmObservable.toList() }

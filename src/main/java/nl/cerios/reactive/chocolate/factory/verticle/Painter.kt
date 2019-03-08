@@ -3,7 +3,6 @@ package nl.cerios.reactive.chocolate.factory.verticle
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
 import nl.cerios.reactive.chocolate.factory.delayAndNotifyConsumption
-import nl.cerios.reactive.chocolate.factory.delayRandomly
 import nl.cerios.reactive.chocolate.factory.model.ChocoNut
 import nl.cerios.reactive.chocolate.factory.model.ColorNut
 import nl.cerios.reactive.chocolate.factory.pickEnum
@@ -21,9 +20,8 @@ class Painter : AbstractVerticle() {
     vertx.eventBus()
         .consumer<JsonObject>("chocoNut.produced")
         .toObservable()
-        .delayAndNotifyConsumption(vertx)
+        .delayAndNotifyConsumption(vertx, 2_000, processingMillis)
         .map { message -> ChocoNut.fromJson(message.body()) }
-        .delayRandomly(processingMillis)
         .map { chocoNut -> ColorNut(chocoNut, pickEnum(Color.values())).toJson() }
         .subscribe(
             { chocoNutJson -> vertx.eventBus().publish("colorNut.produced", chocoNutJson) },

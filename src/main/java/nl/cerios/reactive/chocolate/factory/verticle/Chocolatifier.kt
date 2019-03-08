@@ -3,8 +3,6 @@ package nl.cerios.reactive.chocolate.factory.verticle
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
 import nl.cerios.reactive.chocolate.factory.delayAndNotifyConsumption
-import nl.cerios.reactive.chocolate.factory.delayRandomly
-import nl.cerios.reactive.chocolate.factory.logIt
 import nl.cerios.reactive.chocolate.factory.model.ChocoNut
 import nl.cerios.reactive.chocolate.factory.model.Peanut
 import nl.cerios.reactive.chocolate.factory.pickEnum
@@ -22,10 +20,8 @@ class Chocolatifier : AbstractVerticle() {
     vertx.eventBus()
         .consumer<JsonObject>("peanut.produced")
         .toObservable()
-        .delayAndNotifyConsumption(vertx)
-        .logIt(log, "consuming")
+        .delayAndNotifyConsumption(vertx, 2_000, processingMillis)
         .map { message -> Peanut.fromJson(message.body()) }
-        .delayRandomly(processingMillis)
         .map { peanut -> ChocoNut(peanut, pickEnum(Flavor.values())).toJson() }
         .subscribe(
             { chocoNutJson -> vertx.eventBus().publish("chocoNut.produced", chocoNutJson) },
