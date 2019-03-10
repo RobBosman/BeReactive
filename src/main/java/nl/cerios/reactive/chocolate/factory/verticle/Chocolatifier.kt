@@ -20,7 +20,7 @@ class Chocolatifier : AbstractVerticle() {
     vertx.eventBus()
         .consumer<JsonObject>("peanut.produced")
         .toObservable()
-        .delayAndNotifyConsumption(vertx, 2_000, processingMillis)
+        .delayAndNotifyConsumption(vertx, 2_250, processingMillis)
         .map { message -> Peanut.fromJson(message.body()) }
         .map { peanut -> ChocoNut(peanut, pickEnum(Flavor.values())).toJson() }
         .subscribe(

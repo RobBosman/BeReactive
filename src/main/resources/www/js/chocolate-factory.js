@@ -31,22 +31,26 @@ function consumePeanut(peanutID, chocolatierID) {
     chocolatier.appendChild(peanut);
     peanut.classList.add('beingConsumed');
 
-    discardAfterMillis(peanutID, 2000);
+    setTimeout(function() {
+      processPeanut(peanutID, chocolatierID);
+    }, getComputedStyle(peanut).getPropertyValue('--rampUpMillis'));
   }
 }
 
 function processPeanut(peanutID, chocolatierID) {
-  ;
-}
+  var peanut = document.getElementById(peanutID);
+  var chocolatier = document.getElementById(chocolatierID);
+  if (peanut != null && chocolatier != null) {
+    peanut.parentElement.removeChild(peanut);
+    peanut.classList.remove('beingConsumed');
+    chocolatier.getElementsByClassName('progressBar')[0].appendChild(peanut);
+    peanut.style.transform = "rotate(0)";
+    peanut.classList.add('beingProcessed');
 
-
-function switchClass(elementID, oldClass, newClass) {
-  var element = document.getElementById(elementID);
-  if (element != null) {
-    element.classList.remove(oldClass);
-    element.classList.add(newClass);
+    discardAfterMillis(peanutID, 2000);
   }
 }
+
 
 function discardAfterMillis(elementID, timeoutMillis) {
   setTimeout(function() {

@@ -103,7 +103,7 @@ fun <T : Message<JsonObject>> Observable<T>.delayAndNotifyConsumption(vertx: Ver
         .delay { item ->
           val delayObservable = Observable.create<T> { emitter -> emitter.onNext(item) }
           if (averageProcessingMillis > 0) {
-            delayObservable.delay(averageProcessingMillis.timesHalfToTwo(), MILLISECONDS)
+            delayObservable.delay(averageProcessingMillis/*.timesHalfToTwo()*/, MILLISECONDS)
           } else {
             delayObservable
           }
