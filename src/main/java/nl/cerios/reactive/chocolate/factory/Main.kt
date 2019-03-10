@@ -71,11 +71,11 @@ object Main {
           }
         }
 
-    vertx.setTimer(abortAfterMillis) {
-      vertx.close()
-      log.info("And... it's gone!")
-      System.exit(0)
-    }
+//    vertx.setTimer(abortAfterMillis) {
+//      vertx.close()
+//      log.info("And... it's gone!")
+//      System.exit(0)
+//    }
   }
 
   private fun deployVerticle(vertx: Vertx, deploymentOptions: DeploymentOptions, verticleName: String): Future<Void> {

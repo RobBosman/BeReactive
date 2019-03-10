@@ -1,0 +1,33 @@
+.onConveyorBelt {
+  z-index: -1;
+  animation: onConveyorBelt 8s linear forwards;
+}
+@keyframes onConveyorBelt {
+  0% {top:  0px;}
+  100% {top: 700px; transform: rotate(4turn);}
+}
+
+.beingConsumed {
+  position: relative;
+  z-index: 1;
+  animation: beingConsumed 2s linear forwards;
+}
+@keyframes beingConsumed {
+  0% {left: 40px; top: 95px;}
+  100% {left: 115px; top: 115px;}
+}
+
+
+
+
+
+.beingProcessed {
+  position: relative;
+  height: 100%;
+  background-color: red;
+  animation: beingProcessed 2s linear;
+}
+@keyframes beingProcessed {
+  0% {width: 0%;}
+  100% {width: 100%;}
+}

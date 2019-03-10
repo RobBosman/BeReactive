@@ -1,0 +1,15 @@
+.peanut {
+  position: relative;
+  width: 36px;
+  height: 17px;
+  background: url("/img/peanut.png") no-repeat;
+  background-size: contain;
+}
+
+.chocoNut {
+  position: relative;
+  width: 36px;
+  height: 17px;
+  background: url("/img/chocoNut.png") no-repeat;
+  background-size: contain;
+ }

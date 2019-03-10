@@ -7,57 +7,11 @@
   <link href='https://fonts.googleapis.com/css?family=Cousine' rel='stylesheet' type='text/css'>
   <link href="/css/nouislider.min.css" rel="stylesheet" type="text/css">
   <link href="/css/peanut-pace.css" rel="stylesheet" type="text/css">
+  <link href="/css/static.css" rel="stylesheet" type="text/css">
+  <link href="/css/model.css" rel="stylesheet" type="text/css">
+  <link href="/css/animation.css" rel="stylesheet" type="text/css">
   <link href="/css/chocolate-factory.css" rel="stylesheet" type="text/css">
 </head>
-
-<style type='text/css'>
-.peanut {
-  top: 60px;
-  width: 36px;
-  height: 17px;
-  position: absolute;
-  z-index: 1;
-  background-image: url("img/peanut.png");
-  background-size: cover;
-  animation: peanutOnBelt 8s linear forwards;
-}
-@keyframes peanutOnBelt {
-    0% {top:  60px;}
-  100% {top: 800px; transform: rotate(4turn);}
-}
-
-.progress {
-  position: relative;
-  left: 100px;
-  width: 35px;
-  height: 5px;
-  border: 1px solid green;
-  background-color: lightGreen;
-}
-.progressBar {
-  width: 0%;
-  height: 100%;
-  background-color: red;
-  animation: progressBar 2s linear;
-}
-@keyframes progressBar {
-  100% {width: 100%;}
-}
-
-.worker {
-  width:  200px;
-  height: 200px;
-  background-image: url("img/chocolatier.png");
-  background-size: cover;
-}
-
-.golem {
-  position: relative;
-  left: 70px;
-  top: 100px;
-}
-
-</style>
 
 <body>
 <h1>Reactive Chocolate Factory</h1>
@@ -77,10 +31,11 @@
 </div>
 
 <div class="main">
-  <div id="conveyorBelt"></div>
-  <div class="worker" id="1">
-    <div class="progress"></div>
-    <div class="golem"></div>
+  <div class="conveyorBelt" id="conveyorBeltID"></div>
+  <div class="golem chocolatier" id="chocolatierID">
+    <div class="progressBar"></div>
+    <div class="mapFrom"></div>
+    <div class="mapTo"></div>
   </div>
 </div>
 
