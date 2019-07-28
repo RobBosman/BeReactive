@@ -1,6 +1,6 @@
 package nl.cerios.reactive.chocolate.factory.verticle
 
-import io.vertx.core.Future
+import io.vertx.core.Promise
 import io.vertx.ext.bridge.PermittedOptions
 import io.vertx.ext.web.handler.sockjs.BridgeOptions
 import io.vertx.rxjava.core.AbstractVerticle
@@ -13,7 +13,7 @@ class HttpEventServer : AbstractVerticle() {
 
   private val log = LoggerFactory.getLogger(javaClass)
 
-  override fun start(futureResult: Future<Void>) {
+  override fun start(futureResult: Promise<Void>) {
     val port = config().getInteger("${javaClass.name}.port")
     val router = Router.router(vertx)
 

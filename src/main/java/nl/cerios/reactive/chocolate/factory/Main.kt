@@ -3,6 +3,7 @@ package nl.cerios.reactive.chocolate.factory
 import io.vertx.core.CompositeFuture
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.Future
+import io.vertx.core.Promise
 import io.vertx.core.VertxOptions
 import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.Vertx
@@ -19,6 +20,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import rx.Observable
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import kotlin.math.roundToLong
 import kotlin.random.Random
 
 fun main() = Main.run()
@@ -79,7 +81,7 @@ object Main {
   }
 
   private fun deployVerticle(vertx: Vertx, deploymentOptions: DeploymentOptions, verticleName: String): Future<Void> {
-    val result = Future.future<Void>()
+    val result = Promise.promise<Void>()
     vertx.deployVerticle(verticleName, deploymentOptions) { deployResult ->
       if (deployResult.succeeded()) {
         result.complete()
@@ -87,13 +89,13 @@ object Main {
         result.fail(deployResult.cause())
       }
     }
-    return result
+    return result.future()
   }
 }
 
 fun <T : Enum<T>> pickEnum(enumValues: Array<T>) = enumValues[Random.nextInt(enumValues.size)]
 
-fun Long.timesHalfToTwo() = Math.round(this * (0.5 + 1.5 * Random.nextDouble()))
+fun Long.timesHalfToTwo() = (this * (0.5 + 1.5 * Random.nextDouble())).roundToLong()
 
 fun <T : Message<JsonObject>> Observable<T>.delayAndNotifyConsumption(vertx: Vertx, anticipateMillis: Long, averageProcessingMillis: Long = 0): Observable<out T> =
     delay(anticipateMillis, MILLISECONDS)
