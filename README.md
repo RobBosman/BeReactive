@@ -8,7 +8,7 @@ This repo contains Java (Kotlin!) code to demonstrate:
 
 [Here](https://slides.com/robbosman/be-reactive#/) is my presentation that goes along with the code.
 
-![golem](https://github.com/RobBosman/BeReactive/master/golem.png)
+![golem](https://github.com/RobBosman/BeReactive/blob/master/golem.png)
 
 ### development environment
 This is what I did to set-up the development environment:
