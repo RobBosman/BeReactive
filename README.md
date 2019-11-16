@@ -1,14 +1,14 @@
-# Reactive Chocolate
-### about creating reactive software
+# Be Reactive
+### about reactive software
 
-This repo contains a Java (Kotlin!) server application and an HTML client to demonstrate the usage of
+This repo contains Java (Kotlin!) code to demonstrate:
+* key features of reactive programming
 * async programming with Futures and CompletableFutures
 * Rx Observables ([RxJava](http://reactivex.io/))
-* Rx-ified API of Vert.x (`io.vertx.rxjava.*`)
 
-[Here](https://slides.com/robbosman/reactive#/) is my presentation that goes along with the code.
+[Here](https://slides.com/robbosman/be-reactive#/) is my presentation that goes along with the code.
 
-![golem](https://raw.githubusercontent.com/Cerios/ReactiveChocolate/master/src/main/resources/www/img/golem.png "'functor'")
+![golem](https://github.com/RobBosman/BeReactive/master/golem.png)
 
 ### development environment
 This is what I did to set-up the development environment:
@@ -22,7 +22,6 @@ This is what I did to set-up the development environment:
 * [Coursera - Kotlin for Java Developers](https://www.coursera.org/learn/kotlin-for-java-developers)
 * [ReactiveX](http://reactivex.io/)
 * [Reactive Streams](http://www.reactive-streams.org/)
-* [Vert.x](https://vertx.io/)
 * [Project Reactor](https://projectreactor.io/)
 
 ### good reads

@@ -11,7 +11,7 @@
     </layout>
   </appender>
 
-  <logger name="nl.cerios.reactive" level="DEBUG" additivity="false">
+  <logger name="nl.bransom.reactive" level="DEBUG" additivity="false">
     <appender-ref ref="CONSOLE"/>
   </logger>
 
