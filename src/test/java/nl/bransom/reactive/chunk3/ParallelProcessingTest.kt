@@ -12,7 +12,7 @@ import kotlin.concurrent.thread
 internal object ParallelProcessingTest {
 
   private val log = LoggerFactory.getLogger(javaClass)
-  private const val MAX_PARALLEL_PROCESSES = 10
+  private const val NUM_PARALLEL_PROCESSES = 10
 
   @Test
   fun withThreads() {
@@ -20,15 +20,16 @@ internal object ParallelProcessingTest {
     val startNano = System.nanoTime()
     var endNano = 0L
 
-    IntStream.range(0, MAX_PARALLEL_PROCESSES).forEach {
+    IntStream.range(0, NUM_PARALLEL_PROCESSES)
+        .forEach {
 
-      thread(start = true) {
-        log.debug("performing task")
-        Thread.sleep(1_000)
-        if (total.incrementAndGet() == MAX_PARALLEL_PROCESSES)
-          endNano = System.nanoTime()
-      }
-    }
+          thread(start = true) {
+            log.debug("performing task in thread")
+            Thread.sleep(1_000)
+            if (total.incrementAndGet() == NUM_PARALLEL_PROCESSES)
+              endNano = System.nanoTime()
+          }
+        }
 
     while (endNano == 0L) Thread.yield()
     log.debug("${total.get()} Thread-tasks took ${endNano.minus(startNano) / 1_000_000} ms")
@@ -39,15 +40,16 @@ internal object ParallelProcessingTest {
     val total = AtomicInteger()
     val startNano = System.nanoTime()
     var endNano = 0L
-    IntStream.range(0, MAX_PARALLEL_PROCESSES).forEach {
+    IntStream.range(0, NUM_PARALLEL_PROCESSES)
+        .forEach {
 
-      GlobalScope.launch {
-        log.debug("performing task")
-        delay(1_000)
-        if (total.incrementAndGet() == MAX_PARALLEL_PROCESSES)
-          endNano = System.nanoTime()
-      }
-    }
+          GlobalScope.launch {
+            log.debug("performing task in fiber")
+            delay(1_000)
+            if (total.incrementAndGet() == NUM_PARALLEL_PROCESSES)
+              endNano = System.nanoTime()
+          }
+        }
 
     while (endNano == 0L) Thread.yield()
     log.debug("${total.get()} coroutines-tasks took ${endNano.minus(startNano) / 1_000_000} ms")
