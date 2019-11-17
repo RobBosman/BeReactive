@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 import java.util.stream.IntStream
 import kotlin.concurrent.thread
 
@@ -16,9 +17,9 @@ internal object ParallelProcessingTest {
 
   @Test
   fun withThreads() {
-    val total = AtomicInteger()
     val startNano = System.nanoTime()
-    var endNano = 0L
+    val endNano = AtomicLong(0)
+    val count = AtomicInteger(0)
 
     IntStream.range(0, NUM_PARALLEL_PROCESSES)
         .forEach {
@@ -26,32 +27,33 @@ internal object ParallelProcessingTest {
           thread(start = true) {
             log.debug("performing task in thread")
             Thread.sleep(1_000)
-            if (total.incrementAndGet() == NUM_PARALLEL_PROCESSES)
-              endNano = System.nanoTime()
+            if (count.incrementAndGet() == NUM_PARALLEL_PROCESSES)
+              endNano.set(System.nanoTime())
           }
         }
 
-    while (endNano == 0L) Thread.yield()
-    log.debug("${total.get()} Thread-tasks took ${endNano.minus(startNano) / 1_000_000} ms")
+    while (endNano.get() == 0L) Thread.yield()
+    log.debug("${count.get()} Thread-tasks took ${endNano.get().minus(startNano) / 1_000_000} ms")
   }
 
   @Test
   fun withCoroutines() {
-    val total = AtomicInteger()
     val startNano = System.nanoTime()
-    var endNano = 0L
+    val endNano = AtomicLong(0)
+    val count = AtomicInteger(0)
+
     IntStream.range(0, NUM_PARALLEL_PROCESSES)
         .forEach {
 
           GlobalScope.launch {
             log.debug("performing task in fiber")
             delay(1_000)
-            if (total.incrementAndGet() == NUM_PARALLEL_PROCESSES)
-              endNano = System.nanoTime()
+            if (count.incrementAndGet() == NUM_PARALLEL_PROCESSES)
+              endNano.set(System.nanoTime())
           }
         }
 
-    while (endNano == 0L) Thread.yield()
-    log.debug("${total.get()} coroutines-tasks took ${endNano.minus(startNano) / 1_000_000} ms")
+    while (endNano.get() == 0L) Thread.yield()
+    log.debug("${count.get()} coroutines-tasks took ${endNano.get().minus(startNano) / 1_000_000} ms")
   }
 }
