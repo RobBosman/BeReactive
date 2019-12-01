@@ -10,9 +10,9 @@ internal object ImperativeStyleTest {
 
   @Test
   fun run() {
-    val jokeRaw = fetchJoke()
+    val jokeJson = fetchJoke()
     getMongoClient().use { mongoClient ->
-      convertAndStore(jokeRaw, mongoClient)
+      convertAndStore(jokeJson, mongoClient)
       printAllJokes(mongoClient)
     }
   }

@@ -22,17 +22,19 @@ internal object ResilienceTest {
     val processControl = Semaphore(0)
 
     Single
-        .create<String>     { emitter -> emitter.onSuccess(fetchJokeFlaky()) }
+        .create<String> { emitter -> emitter.onSuccess(fetchJokeFlaky()) }
         .timeout(200, MILLISECONDS)
         .subscribeOn(Schedulers.io())
-        .doOnSuccess        { jokeRaw -> if (!jokeRaw.contains("success"))
-                                throw Throwable("invalid data: $jokeRaw") }
-        .doOnError          { t -> log.warn("error detected: '${t.message}'") }
+        .doOnSuccess { jokeJson ->
+          if (!jokeJson.contains("success"))
+            throw Throwable("invalid data: $jokeJson")
+        }
+        .doOnError { t -> log.warn("error detected: '${t.message}'") }
         .retry(3)
-        .onErrorResumeNext( Single.just("fallback joke"))
-        .doFinally          { processControl.release() }
-        .subscribe(         { jokeRaw -> log.info("'$jokeRaw'") },
-                            { t -> log.error("an ERROR occurred", t) })
+        .onErrorResumeNext(Single.just("fallback joke"))
+        .doFinally { processControl.release() }
+        .subscribe({ jokeJson -> log.info("'$jokeJson'") },
+            { t -> log.error("an ERROR occurred", t) })
 
     log.debug("wait a second...")
     processControl.tryAcquire(1_000, MILLISECONDS)
@@ -44,11 +46,11 @@ internal object ResilienceTest {
     log.debug("here we go")
     val processControl = Semaphore(0)
 
-    val jokeRawO = Single
+    val jokeJsonO = Single
         .create<String> { it.onSuccess(fetchJokeFlaky()) }
         .timeout(200, MILLISECONDS)
         .subscribeOn(Schedulers.io())
-        .doOnSuccess { jokeRaw -> if (!jokeRaw.contains("success")) throw Throwable("invalid data: $jokeRaw") }
+        .doOnSuccess { jokeJson -> if (!jokeJson.contains("success")) throw Throwable("invalid data: $jokeJson") }
         .retry(3)
         .onErrorResumeNext(
             Single.just("""{ "type": "success", "value": { "categories": [], "joke": "fallback joke" } }"""))
@@ -58,9 +60,9 @@ internal object ResilienceTest {
         .timeout(1_000, MILLISECONDS)
         .subscribeOn(Schedulers.io())
         .retry(2)
-        .zipWith(jokeRawO,
-            BiFunction { mongoClient: MongoClient, jokeRaw: String ->
-              val joke = convertAndStore(jokeRaw, mongoClient)
+        .zipWith(jokeJsonO,
+            BiFunction { mongoClient: MongoClient, jokeJson: String ->
+              val joke = convertAndStore(jokeJson, mongoClient)
               mongoClient.close()
               log.debug("closed MongoDB client")
               joke

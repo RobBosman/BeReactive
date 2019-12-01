@@ -88,16 +88,16 @@ internal object AsyncWithObservablesTest {
     log.debug("here we go")
     val processControl = Semaphore(0)
 
-    val jokeRawO = Observable
+    val jokeJsonO = Observable
         .create<String> { emitter -> emitter.onNext(fetchJoke()) }
         .subscribeOn(Schedulers.io())
 
     Observable
         .create<MongoClient> { emitter -> emitter.onNext(getMongoClient()) }
         .subscribeOn(Schedulers.io())
-        .zipWith(jokeRawO,
-            BiFunction { mongoClient: MongoClient, jokeRaw: String ->
-              val joke = convertAndStore(jokeRaw, mongoClient)
+        .zipWith(jokeJsonO,
+            BiFunction { mongoClient: MongoClient, jokeJson: String ->
+              val joke = convertAndStore(jokeJson, mongoClient)
               mongoClient.close()
               log.debug("closed MongoDB client")
               joke

@@ -3,14 +3,17 @@ package nl.bransom.reactive.chunk0;
 import com.mongodb.client.MongoClient;
 import org.junit.jupiter.api.Test;
 
+import static nl.bransom.reactive.chunk0.FetchJokeServiceJava.fetchJoke;
+import static nl.bransom.reactive.chunk0.StorageServiceJava.*;
+
 class ImperativeStyleJavaTest {
 
   @Test
   void run() {
-    final String jokeRaw = nl.bransom.reactive.chunk0.FetchJokeServiceJava.fetchJoke();
-    try (final MongoClient mongoClient = nl.bransom.reactive.chunk0.StorageServiceJava.getMongoClient()) {
-      nl.bransom.reactive.chunk0.StorageServiceJava.convertAndStore(jokeRaw, mongoClient);
-      nl.bransom.reactive.chunk0.StorageServiceJava.printAllJokes(mongoClient);
+    final String jokeJson = fetchJoke();
+    try (final MongoClient mongoClient = getMongoClient()) {
+      convertAndStore(jokeJson, mongoClient);
+      printAllJokes(mongoClient);
     }
   }
 }

@@ -10,7 +10,7 @@ object StorageService {
 
   private val log = LoggerFactory.getLogger(javaClass)
   private val connectionString = System.getProperty("connectionString", "mongodb://localhost:27017")
-  private const val databaseName = "reactive-chocolate"
+  private const val databaseName = "be-reactive"
   private const val collectionName = "jokes"
 
   fun getMongoClient(): MongoClient {
@@ -20,9 +20,9 @@ object StorageService {
     return mongoClient
   }
 
-  fun convertAndStore(jokeRaw: String, mongoClient: MongoClient): String {
+  fun convertAndStore(jokeJson: String, mongoClient: MongoClient): String {
     log.debug("convert and store joke")
-    val jokeValue = Document.parse(jokeRaw)["value"] as Document
+    val jokeValue = Document.parse(jokeJson)["value"] as Document
     val joke = jokeValue["joke"] as String
     val jokeDocument = Document()
         .append("at", LocalDateTime.now())

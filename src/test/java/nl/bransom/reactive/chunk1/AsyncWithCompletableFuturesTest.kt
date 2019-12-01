@@ -29,19 +29,19 @@ internal object AsyncWithCompletableFuturesTest {
         }
 
     log.debug("do you know the answer? - ${provideAnswerCF.isDone}")
-    log.debug("ah, the answer is ${provideAnswerCF.get()}.") // blocking wait
+    log.debug("ah, the answer is ${provideAnswerCF.get()}") // blocking wait
   }
 
   @Test
   fun run() {
     log.debug("here we go")
-    val jokeRawCF = CompletableFuture
+    val jokeJsonCF = CompletableFuture
         .supplyAsync(::fetchJoke)
 
     val allDoneCF = CompletableFuture
         .supplyAsync(::getMongoClient)
-        .thenCombine(jokeRawCF) { mongoClient, jokeRaw ->
-          val joke = convertAndStore(jokeRaw, mongoClient)
+        .thenCombine(jokeJsonCF) { mongoClient, jokeJson ->
+          val joke = convertAndStore(jokeJson, mongoClient)
           mongoClient.close()
           log.debug("closed MongoDB client")
           joke

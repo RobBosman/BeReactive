@@ -21,14 +21,14 @@ internal object AsyncWithFuturesTest {
   fun backToTheFuture() {
     val executor = Executors.newFixedThreadPool(2)
 
-    val future = executor.submit(AsyncWithFuturesTest::findTheAnswer)
+    val future = executor.submit(::findTheAnswer)
 
     log.debug("are you done? - ${future.isDone}")
 
     // do other stuff
 
     val answer = future.get() // blocking wait
-    log.debug("ah, the answer is $answer.")
+    log.debug("ah, the answer is $answer")
 
     executor.shutdown()
   }
@@ -38,16 +38,16 @@ internal object AsyncWithFuturesTest {
     log.debug("here we go")
     val executor = Executors.newFixedThreadPool(4)
 
-    val jokeRawF = executor.submit(::fetchJoke)
+    val jokeJsonF = executor.submit(::fetchJoke)
 
     val mongoClientF = executor.submit(::getMongoClient)
 
     val allDoneF = executor.submit<String> {
       log.debug("wait for async tasks to complete")
-      val jokeRaw = jokeRawF.get() // blocking wait
+      val jokeJson = jokeJsonF.get() // blocking wait
       val mongoClient = mongoClientF.get() // blocking wait
 
-      val joke = convertAndStore(jokeRaw, mongoClient)
+      val joke = convertAndStore(jokeJson, mongoClient)
       mongoClient.close()
       log.debug("closed MongoDB client")
       joke

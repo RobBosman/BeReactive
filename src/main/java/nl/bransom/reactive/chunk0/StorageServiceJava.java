@@ -13,7 +13,7 @@ class StorageServiceJava {
 
   private static final Logger LOG = LoggerFactory.getLogger(StorageServiceJava.class);
   private static final String CONNECTION_STRING = System.getProperty("connectionString", "mongodb://localhost:27017");
-  private static final String DATABASE_NAME = "reactive-chocolate";
+  private static final String DATABASE_NAME = "be-reactive";
   private static final String COLLECTION_NAME = "jokes";
 
   static MongoClient getMongoClient() {
@@ -23,9 +23,9 @@ class StorageServiceJava {
     return mongoClient;
   }
 
-  static void convertAndStore(final String jokeRaw, final MongoClient mongoClient) {
+  static void convertAndStore(final String jokeJson, final MongoClient mongoClient) {
     LOG.debug("convert and store joke");
-    final Document jokeValue = (Document) Document.parse(jokeRaw).get("value");
+    final Document jokeValue = (Document) Document.parse(jokeJson).get("value");
     final String joke = (String) jokeValue.get("joke");
     final Document jokeDocument = new Document()
         .append("at", LocalDateTime.now())
