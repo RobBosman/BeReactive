@@ -33,7 +33,8 @@ internal object ResilienceTest {
         .retry(3)
         .onErrorResumeNext(Single.just("fallback joke"))
         .doFinally { processControl.release() }
-        .subscribe({ jokeJson -> log.info("'$jokeJson'") },
+        .subscribe(
+            { jokeJson -> log.info("'$jokeJson'") },
             { t -> log.error("an ERROR occurred", t) })
 
     log.debug("wait a second...")
