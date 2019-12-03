@@ -24,33 +24,33 @@ internal object AsyncWithObservablesTest {
     val observable = Observable.fromIterable(words)
 
     observable
-        .subscribe { word -> log.debug("subscriber 1: $word") }
+        .subscribe { word -> log.info("subscriber 1: $word") }
 
     observable
         .filter { word -> word.startsWith("h") }
         .map(String::toUpperCase)
-        .subscribe { word -> log.debug("subscriber 2: $word") }
+        .subscribe { word -> log.info("subscriber 2: $word") }
 
     log.debug("make it better")
     words.add(1, "better") // ["hello", "better", "world"]
 
     observable
-        .subscribe { word -> log.debug("subscriber 3: $word") }
+        .subscribe { word -> log.info("subscriber 3: $word") }
   }
 
   @Test
   fun backToTheObservable_2() {
-    val values = listOf(Math.E, Math.PI, Double.POSITIVE_INFINITY)
+    val numbers = listOf(Math.E, Math.PI, Double.POSITIVE_INFINITY)
     val symbols = listOf("\u212E", "\u03C0", "\u221E")
 
     Observable
-        .fromIterable(values)
-        .zipWith(symbols) { value, symbol -> "$symbol = $value" }
+        .fromIterable(numbers)
+        .zipWith(symbols) { number, symbol -> "$symbol = $number" }
         .sorted()
         .delay(100, MILLISECONDS)
         .repeat(3)
         .skipLast(2)
-        .subscribe(log::debug)
+        .subscribe(log::info)
 
     log.debug("wait a second...")
     Thread.sleep(1_000)
@@ -62,21 +62,21 @@ internal object AsyncWithObservablesTest {
 
     Observable
         .just(fetchJoke())
-        .subscribe { joke -> log.info("observable 1: $joke") }
+        .subscribe { jokeJson -> log.info("observable 1: $jokeJson") }
 
     Observable
         .fromFuture(CompletableFuture.supplyAsync(::fetchJoke))
-        .subscribe { joke -> log.info("observable 2: $joke") }
+        .subscribe { jokeJson -> log.info("observable 2: $jokeJson") }
 
     Observable
         .fromFuture(CompletableFuture.supplyAsync(::fetchJoke))
         .subscribeOn(Schedulers.io())
-        .subscribe { joke -> log.info("observable 3: $joke") }
+        .subscribe { jokeJson -> log.info("observable 3: $jokeJson") }
 
     Observable
         .create<String> { emitter -> emitter.onNext(fetchJoke()) }
         .subscribeOn(Schedulers.io())
-        .subscribe { joke -> log.info("observable 4: $joke") }
+        .subscribe { jokeJson -> log.info("observable 4: $jokeJson") }
 
     log.debug("wait a second...")
     Thread.sleep(1_000)
